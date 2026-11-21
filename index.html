@@ -30,6 +30,7 @@
   --kaam:#064F6E; --khana:#A35A00; --pal:#6E5F10;
   --chit-b:#DDEBF1; --chit-y:#F5ECC2; --chit-p:#FCE3C2;
   --gupt:#3A3527;
+  --tape:rgba(255,255,255,.72);
   --error:#A3271B;
   --shadow:0 1px 2px rgba(31,28,18,.06),0 6px 18px rgba(31,28,18,.08);
   --display:"Yatra One","Mukta",Georgia,serif;
@@ -43,7 +44,7 @@
     --bg:#1A1810;--surface:#25221A;--sunk:#2F2B20;--ink:#F5ECC2;--muted:#B5AC8E;--line:#3A3527;
     --primary:#8CC4E0;--on-primary:#1A1810;--accent:#F99D1B;--on-accent:#141414;
     --kaam:#8CC4E0;--khana:#F9A43A;--pal:#D9C45A;--error:#F2836F;
-    --chit-b:#1E3340;--chit-y:#37311C;--chit-p:#3D2C16;--gupt:#5A5240;
+    --chit-b:#1E3340;--chit-y:#37311C;--chit-p:#3D2C16;--gupt:#5A5240;--tape:rgba(245,236,194,.22);
     --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 22px rgba(0,0,0,.35);
     color-scheme:dark;
   }
@@ -120,7 +121,7 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;
 .sawaal strong{display:block;font-family:var(--hand);font-weight:700;font-size:21px;line-height:1.3;margin-top:2px}
 .sawaal span{display:block;font-size:14px;margin-top:6px;opacity:.85}
 .chit{position:relative;border-radius:4px 4px 12px 12px;padding:16px 14px 12px;box-shadow:var(--shadow);transform:rotate(var(--tilt,0deg));background:var(--chit-y)}
-.chit::before{content:"";position:absolute;left:50%;top:-9px;width:64px;height:18px;transform:translateX(-50%) rotate(-2deg);background:color-mix(in srgb,var(--surface) 70%,transparent);border:1px solid var(--line);border-radius:2px}
+.chit::before{content:"";position:absolute;left:50%;top:-9px;width:64px;height:18px;transform:translateX(-50%) rotate(-2deg);background:var(--tape);border:1px solid var(--line);border-radius:2px}
 .chit.c-b{background:var(--chit-b)}
 .chit.c-p{background:var(--chit-p)}
 .chit-top{display:flex;align-items:center;gap:8px;font-size:15px;flex-wrap:wrap}
@@ -139,7 +140,7 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
 .tile{position:relative;aspect-ratio:1;border:0;padding:0;background:var(--sunk);overflow:hidden;border-radius:8px}
 .tile img{width:100%;height:100%;object-fit:cover;display:block}
-.tile .stamp{position:absolute;left:5px;bottom:5px;background:rgba(20,18,10,.75);color:#fff;font-size:12px;font-weight:600;padding:0 6px;border-radius:6px;font-variant-numeric:tabular-nums}
+.tile .ttime{position:absolute;left:5px;bottom:5px;background:rgba(20,18,10,.75);color:#fff;font-size:12px;font-weight:600;padding:0 6px;border-radius:6px;font-variant-numeric:tabular-nums}
 .tile .tg{position:absolute;right:5px;top:5px;width:10px;height:10px;border-radius:50%;border:1.5px solid #fff}
 .bg-kaam{background:var(--kaam)}.bg-khana{background:var(--khana)}.bg-pal{background:var(--pal)}
 .cl-none{color:var(--muted);font-size:15px;padding:6px 2px}
@@ -151,7 +152,7 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;
 .invite .code{font-family:var(--display);font-size:40px;letter-spacing:.14em;line-height:1}
 .invite p{margin:0;font-size:15px;opacity:.9}
 .invite .row a,.invite .row button{flex:1;text-align:center;text-decoration:none;border-radius:12px;padding:10px;font-weight:700;border:1.5px solid currentColor;background:transparent;color:inherit}
-.invite .row a.wa{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.invite .row a.wa{background:var(--on-primary);color:var(--primary);border-color:var(--on-primary)}
 .sec h3{margin:0 0 4px;font-size:19px}
 .sec > p{margin:0 0 10px;color:var(--muted);font-size:15px}
 .mrows{display:flex;flex-direction:column;background:var(--surface);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
@@ -184,7 +185,9 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;
 .sheet h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0;color:var(--primary)}
 .sheet p{margin:0}
 .pick{display:grid;place-items:center;min-height:190px;border:2px dashed var(--line);border-radius:14px;color:var(--muted);text-align:center;padding:12px;cursor:pointer;overflow:hidden}
-.pick img{max-width:100%;max-height:300px;border-radius:10px;display:block}
+.pick{gap:12px;cursor:default;min-height:150px}
+.pick .pw{display:inline-block;max-width:100%}
+.pick .pw > img{width:auto;max-width:100%;max-height:300px;border-radius:10px;display:block}
 .tags{display:flex;gap:8px;border:0;margin:0;padding:0}
 .tags legend{font-size:14px;color:var(--muted);margin-bottom:6px;padding:0}
 .tags label{flex:1}
@@ -222,6 +225,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 .btn.warn{color:var(--error);border-color:currentColor}
 .btn:disabled{opacity:.5;cursor:default}
 .err{color:var(--error);font-size:15px;min-height:0}
+.err:empty{display:none}
 .small{font-size:14px;color:var(--muted)}
 .linkish{border:0;background:none;padding:0;color:var(--primary);font-weight:600;text-decoration:underline}
 .big img{width:100%;border-radius:12px;display:block}
@@ -246,15 +250,15 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 .code-in{font-family:var(--display);font-size:30px;letter-spacing:.18em;text-transform:uppercase;text-align:center}
 .relrows{display:flex;flex-direction:column;gap:8px}
 /* hand-drawn stamps (rough.js draws the ink ring) */
-.stamps{display:flex;gap:10px 8px;flex-wrap:wrap;align-items:center}
-.stamp{position:relative;border:0;background:none;padding:5px 12px;font-family:var(--hand);font-weight:700;font-size:16px;line-height:1.2;color:var(--ink)}
-.stamp:not([data-inked]){border:1.5px solid color-mix(in srgb,var(--ink) 30%,transparent);border-radius:999px}
+/* Quiet pills by default; the hand-drawn ink ring appears only on the stamps YOU put on, so it means something. */
+.stamps{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.stamp{position:relative;display:inline-flex;align-items:center;min-height:40px;border:1.5px solid var(--line);border-radius:999px;background:none;padding:6px 14px;font-family:var(--hand);font-weight:700;font-size:16px;line-height:1.2;color:var(--muted)}
+.stamp[aria-pressed="true"]{color:var(--primary);border-color:transparent}
 .stamp .ink{position:absolute;left:-4px;top:-4px;pointer-events:none;overflow:visible}
 .stamp .ink.on path:first-child{opacity:.22}
 .stamp > span{position:relative}
-.stamp b{font-family:var(--body);font-size:13px;margin-left:5px;font-variant-numeric:tabular-nums}
-.stamp[aria-pressed="true"]{color:var(--primary)}
-.chit .stamp{font-size:15px;padding:4px 11px}
+.stamp b{font-family:var(--body);font-size:13px;margin-left:6px;font-variant-numeric:tabular-nums}
+.chit .stamp{font-size:15px;padding:5px 12px;min-height:38px}
 .psum{display:flex;gap:6px 12px;flex-wrap:wrap;padding:8px 12px 0;font-family:var(--hand);font-weight:700;font-size:15px;color:var(--muted)}
 .psum span b{font-family:var(--body);font-size:13px;margin-left:3px}
 /* doodles over photos */
@@ -262,6 +266,19 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 .pw > img{display:block;width:100%}
 .card .pw > img{aspect-ratio:4/3;height:auto;max-height:none;object-fit:cover;background:var(--sunk)}  /* same preview frame for every photo; full photo opens on tap */
 .pw svg.dd{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+/* caption written on the photo, over a soft dark fade so it reads on any picture */
+.pw .ov{position:absolute;left:0;right:0;bottom:0;padding:36px 14px 12px;background:linear-gradient(to top,rgba(15,13,8,.8),rgba(15,13,8,0));color:#fff;font-family:var(--hand);font-weight:700;font-size:20px;line-height:1.25;text-shadow:0 1px 2px rgba(0,0,0,.45);overflow-wrap:anywhere;pointer-events:none;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.pw .ov:empty{display:none}
+.big .pw .ov{border-radius:0 0 12px 12px;font-size:22px;-webkit-line-clamp:unset}
+.pick .pw .ov{border-radius:0 0 10px 10px}
+/* add-photo: camera or gallery */
+.src{display:flex;flex-direction:column;gap:10px;width:100%}
+.srcbtn{display:flex;align-items:center;justify-content:center;gap:10px;min-height:56px;border-radius:14px;font-weight:700;font-size:17px;border:1.5px solid var(--primary);color:var(--primary);cursor:pointer}
+.srcbtn.main{background:var(--primary);color:var(--on-primary)}
+.srcbtn svg{width:22px;height:22px;flex:none}
+.src.mini{flex-direction:row;gap:8px}
+.src.mini .srcbtn{flex:1;min-height:44px;font-size:15px;background:none;color:var(--primary)}
+.sep{border:0;border-top:1px solid var(--line);margin:2px 0;width:100%}
 .pw.draw svg#pad{pointer-events:auto;touch-action:none;cursor:crosshair}
 .big .pw > img{border-radius:12px}
 .pens{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -472,7 +489,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   const seedOf = s => { let h = 7; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return (h % 9999) + 1; };
   function decorateStamps(root){
     if (!window.rough) return;
-    (root || document).querySelectorAll(".stamp:not([data-inked])").forEach(b => {
+    (root || document).querySelectorAll('.stamp[aria-pressed="true"]:not([data-inked])').forEach(b => {
       const w = b.offsetWidth, h = b.offsetHeight; if (!w) return;
       const NS = "http://www.w3.org/2000/svg", svg = document.createElementNS(NS, "svg");
       const on = b.getAttribute("aria-pressed") === "true";
@@ -845,13 +862,13 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     return bits.length ? `<div class="psum">${bits.join("")}</div>` : "";
   }
   function photoHTML(p, alt){
-    return `<span class="pw">${img(p, alt)}${S.doodles.filter(d => d.post_id === p.id && !S.hideDoodles).map(doodleSVG).join("")}</span>`;
+    return `<span class="pw">${img(p, alt)}${S.doodles.filter(d => d.post_id === p.id && !S.hideDoodles).map(doodleSVG).join("")}${p.caption ? `<span class="ov">${esc(p.caption)}</span>` : ""}</span>`;
   }
   function cardHTML(p){
     return `<button type="button" class="card" data-act="open" data-id="${esc(p.id)}">
-      ${photoHTML(p, `${TAGS[p.tag]||"Pal"}, ${mName(p.member)}`)}
+      ${photoHTML(p, `${TAGS[p.tag]||"Pal"}, ${mName(p.member)}${p.caption ? ": " + p.caption : ""}`)}
       <div class="meta">${whoHTML(p.member)}<span class="tag t-${esc(p.tag||"pal")}">${esc(TAGS[p.tag]||"Pal")}</span><time>${tstr(p.ts)}</time></div>
-      ${p.caption?`<p class="cap">${esc(p.caption)}</p>`:""}${photoSummary(p)}<div class="pad"></div></button>`;
+      ${photoSummary(p)}<div class="pad"></div></button>`;
   }
 
   function chitHTML(c, i){
@@ -926,7 +943,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       return `<section>
         <div class="cl-head">${dotHTML(m.id)}<h3>${title}</h3><span class="cnt">${ps.length} photo</span></div>
         ${ps.length ? `<div class="grid">${ps.map(p => `<button type="button" class="tile" data-act="open" data-id="${esc(p.id)}" aria-label="${esc((TAGS[p.tag]||"Pal")+", "+tstr(p.ts))}">
-          ${img(p, (TAGS[p.tag]||"Pal")+", "+m.name)}<span class="stamp">${tstr(p.ts)} ${ap(new Date(p.ts).getHours())}</span><span class="tg bg-${esc(p.tag||"pal")}"></span></button>`).join("")}</div>`
+          ${img(p, (TAGS[p.tag]||"Pal")+", "+m.name)}<span class="ttime">${tstr(p.ts)} ${ap(new Date(p.ts).getHours())}</span><span class="tg bg-${esc(p.tag||"pal")}"></span></button>`).join("")}</div>`
         : `<p class="cl-none">Abhi tak kuch nahi daala.</p>`}
       </section>`;
     }).join("")}</div>`;
@@ -943,7 +960,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     if (!showInstall()) return "";
     if (dismissable && ls.get("fkd-install-x") === "1") return "";
     return `<div class="install"><img src="icon-192.png" alt="" onerror="this.remove()"><div><strong>App ki tarah install karo</strong><span>Home screen pe icon aa jayega, bina browser ke khulega.</span></div>
-      <button type="button" class="btn go" data-act="install">Install</button>${dismissable ? `<button type="button" class="x" data-act="installx" aria-label="Band karo">×</button>` : ""}</div>`;
+      <button type="button" class="btn pri" data-act="install">Install</button>${dismissable ? `<button type="button" class="x" data-act="installx" aria-label="Band karo">×</button>` : ""}</div>`;
   }
   async function doInstall(){
     if (installEvt) {
@@ -1037,7 +1054,6 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     renderHeader(); renderNotes();
     $("#main").innerHTML = S.mode === "parivaar" ? renderParivaar() : S.mode === "dil" ? renderDil() : renderPhotos();
     decorateStamps($("#main"));
-    if (S.mode === "parivaar") annotate($(".invite .code"), "code", { type:"circle", color:"#F99D1B", strokeWidth:2, padding:[6,14], iterations:2 });
     const ct = $("#celeTxt");
     if (ct) {
       annotate(ct, "cele" + S.day, { type:"highlight", color:"rgba(249,157,27,.35)", iterations:1, multiline:true });
@@ -1217,25 +1233,37 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   }
 
   function addPhotoSheet(){
+    const CAM = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>`;
+    const GAL = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 17l-5-5-9 8"/></svg>`;
     openSheet(`<h2>Naya pal</h2>
-      <label class="pick" for="file" id="pick">Photo chuno ya camera se kheencho</label>
-      <input type="file" id="file" accept="image/*" hidden>
+      <div class="pick" id="pick"><div class="src">
+        <label class="srcbtn main" for="cam">${CAM}Camera se kheencho</label>
+        <label class="srcbtn" for="gal">${GAL}Gallery se chuno</label></div></div>
+      <input type="file" id="cam" accept="image/*" capture="environment" hidden>
+      <input type="file" id="gal" accept="image/*" hidden>
+      <input class="field" id="cap" maxlength="120" placeholder="Photo pe kuch likho (optional)" aria-label="Caption">
       <fieldset class="tags"><legend>Kiski photo hai?</legend>
         <label class="t-kaam"><input type="radio" name="tag" value="kaam"><span>Kaam</span></label>
         <label class="t-khana"><input type="radio" name="tag" value="khana" checked><span>Khana</span></label>
         <label class="t-pal"><input type="radio" name="tag" value="pal"><span>Pal</span></label>
       </fieldset>
-      <input class="field" id="cap" maxlength="120" placeholder="Kuch likhna hai? (optional)" aria-label="Caption">
       <p class="err" id="aErr"></p>
       <div class="row"><button type="button" class="btn" data-close>Rehne do</button><button type="button" class="btn pri" id="post" disabled>Daal do</button></div>`);
     let file = null;
     sheet.querySelector("[data-close]").onclick = closeSheet;
-    $("#file").addEventListener("change", e => {
-      file = e.target.files[0] || null;
-      if (!file) return;
-      $("#pick").innerHTML = `<img src="${URL.createObjectURL(file)}" alt="Chuni hui photo">`;
+    const capOv = () => $("#capOv");
+    const onPick = e => {
+      const f = e.target.files[0]; e.target.value = "";
+      if (!f) return;
+      file = f;
+      $("#pick").innerHTML = `<span class="pw"><img src="${URL.createObjectURL(file)}" alt="Chuni hui photo"><span class="ov" id="capOv"></span></span>
+        <div class="src mini"><label class="srcbtn" for="cam">${CAM}Dobara kheencho</label><label class="srcbtn" for="gal">${GAL}Doosri chuno</label></div>`;
+      capOv().textContent = $("#cap").value.trim();
       $("#post").disabled = false; $("#aErr").textContent = "";
-    });
+    };
+    $("#cam").addEventListener("change", onPick);
+    $("#gal").addEventListener("change", onPick);
+    $("#cap").addEventListener("input", () => { if (capOv()) capOv().textContent = $("#cap").value.trim(); });
     $("#post").addEventListener("click", async () => {
       if (!file) return;
       const btn = $("#post"); btn.disabled = true; btn.textContent = "Daal rahe hain…";
@@ -1325,7 +1353,6 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     const myDd = dds.filter(d => d.member === S.me);
     box.innerHTML = `<div class="big">${photoHTML(p, (TAGS[p.tag]||"Pal")+", "+mName(p.member))}</div>
       <div class="meta" style="padding:0">${whoHTML(p.member)}<span class="tag t-${esc(p.tag||"pal")}">${esc(TAGS[p.tag]||"Pal")}</span><time>${tstr(p.ts)} ${ap(h)}, ${tod(h)}</time></div>
-      ${p.caption?`<p>${esc(p.caption)}</p>`:""}
       <div class="stamps">${PHOTO_STAMPS.map(([k, l]) => { const n = rx.filter(r => r.kind === k).length; const on = rx.some(r => r.kind === k && r.member === S.me);
         return `<button type="button" class="stamp" data-vact="stamp" data-k="${k}" data-id="${esc(p.id)}" aria-pressed="${on}"><span>${l}${n?`<b>${n}</b>`:""}</span></button>`; }).join("")}</div>
       ${rx.length ? `<p class="small">${[...new Set(rx.map(r => r.member))].map(m => esc(mLabel(m))).join(", ")} ne stamp lagaya</p>` : ""}
@@ -1333,10 +1360,12 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
         ${dds.length ? `<span>${dds.length} doodle: ${[...new Set(dds.map(d => d.member))].map(m => esc(mLabel(m))).join(", ")}</span>
         <button type="button" class="linkish" data-vact="hidedd">${S.hideDoodles ? "Doodle dikhao" : "Doodle chhupao"}</button>` : ""}
         ${myDd.length ? `<button type="button" class="linkish" data-vact="deldd" style="color:var(--error)">Mera doodle hatao</button>` : ""}</div>
+      <hr class="sep">
       <div class="cmts">${cms.map(c => `<div class="cmt">${dotHTML(c.member)}<div><b>${esc(mName(c.member))}</b>${mRel(c.member)?` <span class="rel">· ${esc(mRel(c.member))}</span>`:""}<time>${tstr(c.ts)}</time><p>${esc(c.body)}</p>
           ${c.member === S.me ? `<button type="button" class="x" data-vact="delc" data-id="${esc(c.id)}">hatao</button>` : ""}</div></div>`).join("")}</div>
       <form class="row" id="cf"><input class="field" id="ci" maxlength="300" placeholder="Kuch kaho…" aria-label="Comment likho" autocomplete="off"><button type="submit" class="btn pri" style="flex:none">Bhejo</button></form>
       <p class="err" id="vErr"></p>
+      <hr class="sep">
       <div class="row">${p.member === S.me ? `<button type="button" class="btn warn" data-vact="delpost">Photo hatao</button>` : ""}<button type="button" class="btn" data-vact="close">Band karo</button></div>`;
     $("#ci").value = keep;
     decorateStamps(box);
