@@ -1,0 +1,8 @@
+# Only the static app goes to GitHub Pages.
+supabase/
+*.sql
+CLAUDE.md
+README.md
+.claude/
+.remember/
+.env*

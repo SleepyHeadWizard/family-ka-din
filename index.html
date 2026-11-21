@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#064F6E">
+<title>Family Ka Din</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yatra+One&family=Kalam:wght@400;700&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Palette: Sanzo Wada combination 151 (Sulphur Yellow / Vandar Poel's Blue / Yellow Orange).
+   Roles: sulphur-tinted neutrals for surfaces (most area), deep blue as primary (~30%),
+   yellow-orange only on the one action to press (~10%). Text colours were contrast-checked.
+   Dil Ki Baat notes use light tints of the same three hues; text on them is always --ink. */
+:root{
+  --bg:#FBF8EE;
+  --surface:#FFFFFF;
+  --sunk:#F5ECC2;
+  --ink:#1F1C12;
+  --muted:#6B6450;
+  --line:#E6DEBE;
+  --primary:#064F6E;
+  --on-primary:#FFFFFF;
+  --accent:#F99D1B;
+  --on-accent:#141414;
+  --kaam:#064F6E; --khana:#A35A00; --pal:#6E5F10;
+  --chit-b:#DDEBF1; --chit-y:#F5ECC2; --chit-p:#FCE3C2;
+  --gupt:#3A3527;
+  --error:#A3271B;
+  --shadow:0 1px 2px rgba(31,28,18,.06),0 6px 18px rgba(31,28,18,.08);
+  --display:"Yatra One","Mukta",Georgia,serif;
+  --hand:"Kalam","Mukta",cursive;
+  --body:"Mukta",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --hdr:200px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1A1810;--surface:#25221A;--sunk:#2F2B20;--ink:#F5ECC2;--muted:#B5AC8E;--line:#3A3527;
+    --primary:#8CC4E0;--on-primary:#1A1810;--accent:#F99D1B;--on-accent:#141414;
+    --kaam:#8CC4E0;--khana:#F9A43A;--pal:#D9C45A;--error:#F2836F;
+    --chit-b:#1E3340;--chit-y:#37311C;--chit-p:#3D2C16;--gupt:#5A5240;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 22px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--primary)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:8px}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px 140px;padding-top:env(safe-area-inset-top)}
+[hidden]{display:none!important}
+
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;display:flex;flex-direction:column;gap:12px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-family:var(--display);font-weight:400;font-size:26px;line-height:1;margin:0;color:var(--primary);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.me-chip{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px 4px 4px;font-size:15px;flex:none}
+.dot{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;color:#fff;font-weight:700;font-size:13px;flex:none}
+.modes{display:flex;gap:20px;border-bottom:1.5px solid var(--line)}
+.modes button{border:0;background:none;padding:2px 0 8px;margin-bottom:-1.5px;font-size:17px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent}
+.modes button[aria-pressed="true"]{color:var(--primary);border-bottom-color:var(--primary)}
+.modes .hand{font-family:var(--hand);font-weight:700;font-size:19px}
+.daynav{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.daynav button{border:1px solid var(--line);background:var(--surface);border-radius:10px;width:40px;height:40px;font-size:20px;line-height:1}
+.daynav button:disabled{opacity:.35;cursor:default}
+.daylabel{text-align:center;display:flex;flex-direction:column}
+.daylabel strong{font-size:18px;font-weight:600}
+.daylabel span{font-size:14px;color:var(--muted)}
+
+.who{display:flex;gap:10px;overflow-x:auto;padding:4px 4px 6px;scrollbar-width:none}
+.who::-webkit-scrollbar{display:none}
+.who button{border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:58px;max-width:74px;font-size:13px;color:var(--muted);line-height:1.2;text-align:center}
+.ava{position:relative;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:18px;outline:2px dashed var(--line);outline-offset:3px;flex:none}
+.ava.done{outline:3px solid var(--primary);outline-offset:2px}
+.ava .n{position:absolute;right:-6px;bottom:-4px;background:var(--primary);color:var(--on-primary);font-size:12px;font-weight:700;border-radius:999px;min-width:20px;height:20px;display:grid;place-items:center;padding:0 5px;font-variant-numeric:tabular-nums}
+.who button.on{color:var(--ink);font-weight:600}
+.who button.on .ava{box-shadow:0 0 0 6px var(--sunk)}
+.ava.all{background:var(--ink);color:var(--bg);font-size:14px}
+.ava.gupt,.dot.gupt{background:var(--gupt)}
+
+.note{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--primary);border-radius:10px;padding:10px 12px;font-size:15px;color:var(--muted);margin:6px 0}
+
+.timeline{display:flex;flex-direction:column;gap:18px;margin-top:8px}
+.hour{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:start}
+.rail{position:sticky;top:calc(var(--hdr) + 8px);display:flex;flex-direction:column;align-items:flex-end;padding-top:2px}
+.num{font-family:var(--display);font-size:46px;line-height:.9;color:var(--primary);font-variant-numeric:tabular-nums}
+.ap{font-size:14px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.tod{font-size:13px;color:var(--muted)}
+.cards{display:flex;flex-direction:column;gap:12px;border-left:2px solid var(--line);padding-left:14px;min-width:0}
+.card{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;border:0;padding:0;text-align:left;width:100%}
+.card img{display:block;width:100%;max-height:420px;object-fit:cover;background:var(--sunk)}
+.meta{display:flex;align-items:center;gap:8px;padding:10px 12px 0;font-size:15px;flex-wrap:wrap}
+.nm{display:flex;align-items:center;gap:6px;font-weight:600;min-width:0}
+.nm .rel{font-weight:500;color:var(--muted)}
+.meta .dot,.chit-top .dot{width:20px;height:20px;font-size:11px}
+.meta time{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums}
+.tag{font-size:13px;font-weight:600;border-radius:999px;padding:1px 9px;border:1.5px solid currentColor}
+.t-kaam{color:var(--kaam)}.t-khana{color:var(--khana)}.t-pal{color:var(--pal)}
+.cap{margin:4px 12px 0;font-size:16px;overflow-wrap:anywhere}
+.card .pad{height:12px}
+.imgfail{display:grid;place-items:center;height:160px;background:var(--sunk);color:var(--muted);font-size:14px}
+
+.now .num{color:var(--ink)}
+.now .cards{border-left:2px dashed var(--primary)}
+.nowbox{border:2px dashed var(--primary);background:var(--sunk);border-radius:14px;padding:16px;text-align:left;width:100%}
+.nowbox strong{display:block;font-size:17px}
+.nowbox span{color:var(--muted);font-size:15px}
+.empty{color:var(--muted);text-align:center;padding:40px 10px}
+
+/* Dil Ki Baat */
+.sawaal{display:block;width:100%;text-align:left;border:0;margin:8px 0 4px;padding:14px 16px;border-radius:14px;background:var(--primary);color:var(--on-primary)}
+.sawaal small{display:block;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+.sawaal strong{display:block;font-family:var(--hand);font-weight:700;font-size:21px;line-height:1.3;margin-top:2px}
+.sawaal span{display:block;font-size:14px;margin-top:6px;opacity:.85}
+.chit{position:relative;border-radius:4px 4px 12px 12px;padding:16px 14px 12px;box-shadow:var(--shadow);transform:rotate(var(--tilt,0deg));background:var(--chit-y)}
+.chit::before{content:"";position:absolute;left:50%;top:-9px;width:64px;height:18px;transform:translateX(-50%) rotate(-2deg);background:color-mix(in srgb,var(--surface) 70%,transparent);border:1px solid var(--line);border-radius:2px}
+.chit.c-b{background:var(--chit-b)}
+.chit.c-p{background:var(--chit-p)}
+.chit-top{display:flex;align-items:center;gap:8px;font-size:15px;flex-wrap:wrap}
+.chit-top time{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums}
+.mood{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);opacity:.8}
+.chit-q{margin:10px 0 0;font-size:14px;color:var(--muted)}
+.chit-body{margin:6px 0 0;font-family:var(--hand);font-size:21px;line-height:1.35;overflow-wrap:anywhere;white-space:pre-wrap}
+.reacts{display:flex;gap:10px 8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.reacts .del{margin-left:auto;border:0;background:none;color:var(--muted);text-decoration:underline;padding:3px 2px}
+.reacts .del.armed{color:var(--error);font-weight:700}
+
+.collage{display:flex;flex-direction:column;gap:22px;margin-top:8px}
+.cl-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.cl-head h3{margin:0;font-size:19px;font-weight:700}
+.cl-head .cnt{color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.tile{position:relative;aspect-ratio:1;border:0;padding:0;background:var(--sunk);overflow:hidden;border-radius:8px}
+.tile img{width:100%;height:100%;object-fit:cover;display:block}
+.tile .stamp{position:absolute;left:5px;bottom:5px;background:rgba(20,18,10,.75);color:#fff;font-size:12px;font-weight:600;padding:0 6px;border-radius:6px;font-variant-numeric:tabular-nums}
+.tile .tg{position:absolute;right:5px;top:5px;width:10px;height:10px;border-radius:50%;border:1.5px solid #fff}
+.bg-kaam{background:var(--kaam)}.bg-khana{background:var(--khana)}.bg-pal{background:var(--pal)}
+.cl-none{color:var(--muted);font-size:15px;padding:6px 2px}
+
+/* Parivaar */
+.fam{display:flex;flex-direction:column;gap:18px;margin-top:12px}
+.invite{background:var(--primary);color:var(--on-primary);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.invite small{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+.invite .code{font-family:var(--display);font-size:40px;letter-spacing:.14em;line-height:1}
+.invite p{margin:0;font-size:15px;opacity:.9}
+.invite .row a,.invite .row button{flex:1;text-align:center;text-decoration:none;border-radius:12px;padding:10px;font-weight:700;border:1.5px solid currentColor;background:transparent;color:inherit}
+.invite .row a.wa{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.sec h3{margin:0 0 4px;font-size:19px}
+.sec > p{margin:0 0 10px;color:var(--muted);font-size:15px}
+.mrows{display:flex;flex-direction:column;background:var(--surface);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.mrow{display:flex;align-items:center;gap:12px;padding:12px 14px;border:0;border-top:1px solid var(--line);background:none;text-align:left;width:100%}
+.mrow:first-child{border-top:0}
+.mrow .ava{width:42px;height:42px;font-size:16px;outline:0}
+.mrow .info{flex:1;min-width:0;display:flex;flex-direction:column}
+.mrow .info strong{font-size:17px}
+.mrow .info span{font-size:14px;color:var(--muted)}
+.mrow .info span b{color:var(--ink);font-weight:600}
+.pill{font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--sunk);color:var(--ink);white-space:nowrap}
+.chev{color:var(--muted);font-size:20px}
+.sugg{background:var(--sunk);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.sugg p{margin:0;font-size:16px}
+.sugg .row .btn{padding:8px}
+.foot{display:flex;flex-direction:column;gap:8px;align-items:flex-start;font-size:15px}
+
+/* bottom bar */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:6;padding:10px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg) 70%,transparent)}
+.bar-in{max-width:560px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.seg{flex:1;display:flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+.seg button{flex:1;border:0;background:none;border-radius:9px;padding:9px 0;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--primary);color:var(--on-primary)}
+.add{border:0;background:var(--accent);color:var(--on-accent);font-weight:700;font-size:17px;border-radius:14px;padding:13px 20px;box-shadow:var(--shadow);white-space:nowrap}
+.add.wide{flex:1}
+
+/* sheets */
+.scrim{position:fixed;inset:0;z-index:10;background:rgba(15,13,8,.55);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:560px;max-height:92%;overflow:auto;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
+.sheet h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0;color:var(--primary)}
+.sheet p{margin:0}
+.pick{display:grid;place-items:center;min-height:190px;border:2px dashed var(--line);border-radius:14px;color:var(--muted);text-align:center;padding:12px;cursor:pointer;overflow:hidden}
+.pick img{max-width:100%;max-height:300px;border-radius:10px;display:block}
+.tags{display:flex;gap:8px;border:0;margin:0;padding:0}
+.tags legend{font-size:14px;color:var(--muted);margin-bottom:6px;padding:0}
+.tags label{flex:1}
+.tags input{position:absolute;opacity:0;pointer-events:none}
+.tags span{display:block;text-align:center;border:1.5px solid var(--line);border-radius:12px;padding:9px 0;font-weight:600}
+.tags input:checked+span{border-color:currentColor;background:var(--sunk)}
+.tags input:focus-visible+span{outline:3px solid var(--accent);outline-offset:2px}
+.moods-pick{flex-wrap:wrap}
+.moods-pick legend{width:100%}
+.moods-pick label{flex:none}
+.moods-pick label span{color:var(--ink);padding:6px 14px;border-radius:999px}
+.moods-pick input:checked+span{border-color:var(--ink);border-width:2px}
+.moods-pick .c-y input:checked+span{background:var(--chit-y)}
+.moods-pick .c-b input:checked+span{background:var(--chit-b)}
+.moods-pick .c-p input:checked+span{background:var(--chit-p)}
+.starters{display:flex;gap:6px;flex-wrap:wrap}
+.starters button{border:1.5px dashed var(--line);background:var(--bg);border-radius:999px;padding:4px 12px;font-size:14px;font-family:var(--hand)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{border:1.5px solid var(--line);background:var(--bg);border-radius:999px;padding:5px 13px;font-size:15px;font-weight:600}
+.chips button[aria-pressed="true"]{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.chips button.sug{border-color:var(--primary);border-style:dashed}
+.grp{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:2px 0 -6px}
+.field{width:100%;border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 12px}
+textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-size:20px;line-height:1.35}
+.compose{border-radius:12px;padding:2px;transition:background .2s}
+.compose.c-y{background:var(--chit-y)}.compose.c-b{background:var(--chit-b)}.compose.c-p{background:var(--chit-p)}
+.compose textarea{background:transparent;border-color:transparent}
+.count{font-size:13px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums;margin-top:-8px}
+.toggle{display:flex;gap:10px;align-items:flex-start;font-size:16px}
+.toggle input{width:20px;height:20px;margin-top:3px;accent-color:var(--primary);flex:none}
+.row{display:flex;gap:10px}
+.btn{flex:1;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:12px;font-weight:600}
+.btn.pri{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.btn.go{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.warn{color:var(--error);border-color:currentColor}
+.btn:disabled{opacity:.5;cursor:default}
+.err{color:var(--error);font-size:15px;min-height:0}
+.small{font-size:14px;color:var(--muted)}
+.linkish{border:0;background:none;padding:0;color:var(--primary);font-weight:600;text-decoration:underline}
+.big img{width:100%;border-radius:12px;display:block}
+
+/* onboarding */
+.onb{min-height:100vh;max-width:460px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top)) 20px 40px;display:flex;flex-direction:column;gap:18px}
+.onb .hero{font-family:var(--display);font-weight:400;font-size:44px;line-height:1.02;margin:24px 0 0;color:var(--primary);text-wrap:balance}
+.onb h2{font-family:var(--display);font-weight:400;font-size:30px;line-height:1.1;margin:8px 0 0;color:var(--primary);text-wrap:balance}
+.onb p{margin:0;color:var(--muted)}
+.onb .lead{font-size:18px;color:var(--ink)}
+.onb .stack{display:flex;flex-direction:column;gap:10px}
+.onb label.lbl{font-size:14px;font-weight:600;color:var(--muted);margin-bottom:-10px}
+.onb .back{align-self:flex-start;border:0;background:none;color:var(--primary);font-weight:600;padding:0}
+.hours{display:flex;gap:6px;align-items:flex-end;height:64px}
+.hours i{flex:1;border-radius:6px 6px 2px 2px;background:var(--sunk)}
+.hours i.on{background:var(--primary)}
+.hours i.acc{background:var(--accent)}
+.steps{display:flex;gap:6px}
+.steps i{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.steps i.on{background:var(--primary)}
+.code-in{font-family:var(--display);font-size:30px;letter-spacing:.18em;text-transform:uppercase;text-align:center}
+.relrows{display:flex;flex-direction:column;gap:8px}
+/* hand-drawn stamps (rough.js draws the ink ring) */
+.stamps{display:flex;gap:10px 8px;flex-wrap:wrap;align-items:center}
+.stamp{position:relative;border:0;background:none;padding:5px 12px;font-family:var(--hand);font-weight:700;font-size:16px;line-height:1.2;color:var(--ink)}
+.stamp:not([data-inked]){border:1.5px solid color-mix(in srgb,var(--ink) 30%,transparent);border-radius:999px}
+.stamp .ink{position:absolute;left:-4px;top:-4px;pointer-events:none;overflow:visible}
+.stamp .ink.on path:first-child{opacity:.22}
+.stamp > span{position:relative}
+.stamp b{font-family:var(--body);font-size:13px;margin-left:5px;font-variant-numeric:tabular-nums}
+.stamp[aria-pressed="true"]{color:var(--primary)}
+.chit .stamp{font-size:15px;padding:4px 11px}
+.psum{display:flex;gap:6px 12px;flex-wrap:wrap;padding:8px 12px 0;font-family:var(--hand);font-weight:700;font-size:15px;color:var(--muted)}
+.psum span b{font-family:var(--body);font-size:13px;margin-left:3px}
+/* doodles over photos */
+.pw{position:relative;display:block}
+.pw > img{display:block;width:100%}
+.card .pw > img{max-height:420px;object-fit:cover;background:var(--sunk)}
+.pw svg.dd{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.pw.draw svg#pad{pointer-events:auto;touch-action:none;cursor:crosshair}
+.big .pw > img{border-radius:12px}
+.pens{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pens button{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);padding:0}
+.pens button[aria-pressed="true"]{outline:3px solid var(--primary);outline-offset:2px}
+.ddlist{font-size:14px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+/* comments */
+.cmts{display:flex;flex-direction:column;gap:12px}
+.cmt{display:flex;gap:10px;align-items:flex-start}
+.cmt .dot{margin-top:2px}
+.cmt div{flex:1;min-width:0}
+.cmt b{font-weight:600}
+.cmt .rel{color:var(--muted)}
+.cmt time{color:var(--muted);font-size:13px;margin-left:6px}
+.cmt p{margin:2px 0 0;overflow-wrap:anywhere}
+.cmt .x{border:0;background:none;color:var(--muted);font-size:13px;text-decoration:underline;padding:0}
+/* nishaan */
+.ava svg.mark,.dot svg.mark{width:80%;height:80%;display:block}
+.markpad{width:220px;height:220px;border-radius:50%;margin:0 auto;position:relative;touch-action:none}
+.markpad svg{width:100%;height:100%;display:block;cursor:crosshair}
+.nudge{display:flex;gap:12px;align-items:center;background:var(--surface);border:1.5px dashed var(--primary);border-radius:14px;padding:12px 14px;text-align:left;width:100%}
+.nudge strong{display:block}
+.nudge span{font-size:14px;color:var(--muted)}
+/* install */
+.install{display:flex;gap:12px;align-items:center;background:var(--sunk);border-radius:14px;padding:12px 14px;margin:8px 0 4px}
+.install img{width:44px;height:44px;border-radius:10px;flex:none}
+.install div{flex:1;min-width:0}
+.install strong{display:block;font-size:16px}
+.install span{font-size:14px;color:var(--muted)}
+.install .btn{flex:none;padding:9px 14px}
+.install .x{border:0;background:none;color:var(--muted);font-size:22px;line-height:1;padding:4px;flex:none}
+.steps-list{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px}
+/* celebration */
+.cele{margin:10px 0 2px;text-align:center;font-family:var(--hand);font-weight:700;font-size:22px;color:var(--ink)}
+.cele span{padding:0 6px}
+
+@media (prefers-reduced-motion: no-preference){
+  .sheet{animation:up .22s ease-out}
+  @keyframes up{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}
+}
+@media (prefers-reduced-motion: reduce){ .chit{transform:none} }
+</style>
+</head>
+<body>
+
+<section class="onb" id="onb" hidden></section>
+
+<div id="app" hidden>
+<div class="wrap">
+  <header id="hdr">
+    <div class="top">
+      <h1 class="brand" id="famName">Family Ka Din</h1>
+      <button class="me-chip" id="meChip" data-act="mode" data-m="parivaar" type="button"><span class="dot" id="meDot">?</span><span id="meName"></span></button>
+    </div>
+    <div class="modes" role="group" aria-label="Section">
+      <button type="button" id="mPhotos" data-act="mode" data-m="photos" aria-pressed="true">Photos</button>
+      <button type="button" id="mDil" data-act="mode" data-m="dil" aria-pressed="false" class="hand">Dil Ki Baat</button>
+      <button type="button" id="mFam" data-act="mode" data-m="parivaar" aria-pressed="false">Parivaar</button>
+    </div>
+    <div class="daynav" id="daynav">
+      <button type="button" id="prevDay" data-act="prev" aria-label="Pichhla din">‹</button>
+      <div class="daylabel"><strong id="dayTitle">Aaj</strong><span id="daySub"></span></div>
+      <button type="button" id="nextDay" data-act="next" aria-label="Agla din">›</button>
+    </div>
+    <div class="who" id="who" role="group" aria-label="Kisne daala"></div>
+  </header>
+  <div id="notes"></div>
+  <main id="main"><p class="empty">Load ho raha hai…</p></main>
+</div>
+
+<nav class="bar">
+  <div class="bar-in">
+    <div class="seg" id="seg" role="group" aria-label="View">
+      <button type="button" id="vTimeline" data-act="view" data-v="timeline" aria-pressed="true">Timeline</button>
+      <button type="button" id="vCollage" data-act="view" data-v="collage" aria-pressed="false">Collage</button>
+    </div>
+    <button type="button" class="add" id="addBtn" data-act="add">+ Photo</button>
+  </div>
+</nav>
+</div>
+
+<div class="scrim" id="scrim" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+<!-- Open-source, MIT/ISC licensed: hand-drawn shapes, sketchy annotations, petal confetti -->
+<script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/rough-notation@0.5.1/lib/rough-notation.iife.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.js"></script>
+<script>
+(() => {
+  /* ================= helpers ================= */
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const pad = n => String(n).padStart(2, "0");
+  const dayKey = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const todayKey = () => dayKey(new Date());
+  const parseDay = k => { const [y,m,d] = k.split("-").map(Number); return new Date(y, m-1, d); };
+  const shiftDay = (k, n) => { const d = parseDay(k); d.setDate(d.getDate()+n); return dayKey(d); };
+  const VAAR = ["Ravivar","Somvar","Mangalvar","Budhvar","Guruvar","Shukravar","Shanivar"];
+  const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const TAGS = { kaam:"Kaam", khana:"Khana", pal:"Pal" };
+  const tod = h => h>=4&&h<12 ? "subah" : h>=12&&h<16 ? "dopahar" : h>=16&&h<20 ? "shaam" : "raat";
+  const h12 = h => (h%12)||12;
+  const ap = h => h<12 ? "am" : "pm";
+  const tstr = ts => { const d = new Date(ts); return `${h12(d.getHours())}:${pad(d.getMinutes())}`; };
+  const uid = () => (crypto.randomUUID ? crypto.randomUUID() : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c==="x"?r:(r&3|8)).toString(16); }));
+  const ls = {
+    get(k){ try { return localStorage.getItem(k); } catch { return null; } },
+    set(k,v){ try { localStorage.setItem(k,v); } catch {} },
+    del(k){ try { localStorage.removeItem(k); } catch {} }
+  };
+  const mine = {
+    list(){ try { return JSON.parse(ls.get("fkd-mine") || "[]"); } catch { return []; } },
+    add(id){ const l = mine.list(); l.push(id); ls.set("fkd-mine", JSON.stringify(l.slice(-500))); },
+    has(id){ return mine.list().includes(id); }
+  };
+
+  /* ================= content ================= */
+  const MOODS = {
+    yunhi:["Bas Yunhi","y"], yaad:["Yaadein","y"], khushi:["Khushkhabri","p"],
+    shukriya:["Shukriya","p"], masti:["Masti","p"], sapna:["Sapna","b"],
+    raaz:["Raaz","y"], maafi:["Maafi","b"], shikayat:["Shikayat","b"], custom:["Kuch aur","y"]
+  };
+  const REACTS = [["dil","Dil se"],["haha","Haha"],["same","Same yaar"],["maaf","Maaf kiya"]];
+  const STARTERS = {
+    yunhi:["Aaj yunhi khayal aaya ki… ","Pata hai aaj kya hua? "],
+    yaad:["Yaad hai jab… ","Aaj achanak yaad aaya… "],
+    khushi:["Ek acchi khabar hai! ","Aaj bahut khush hoon kyunki… "],
+    shukriya:["Kabhi bola nahi, par thank you… ","Aaj kisi ne mera din bana diya… "],
+    masti:["Aaj ka sabse funny moment… ","Socho kya hua… "],
+    sapna:["Ek din main… ","Is saal mujhe … karna hai. "],
+    raaz:["Kisi ko nahi pata, par… ","Sach bataun toh… "],
+    maafi:["Sorry, woh … maine kiya tha. ","Us din ke liye sorry… "],
+    shikayat:["Official shikayat: ","Ghar mein koi meri baat nahi sunta jab… "],
+    custom:[]
+  };
+  const SAWAAL = [
+    "Aaj ka sabse accha pal kya tha?","Aaj kya khaya jo maza aa gaya?","Bachpan ka kaunsa khel phir se khelna hai?",
+    "Mummy ke haath ka kaunsa khana sabse best hai?","Koi gaana jo aaj din bhar dimaag mein chal raha hai?",
+    "Is hafte kis baat pe sabse zyada hasi aayi?","Agar aaj chhutti hoti toh kya karte?","Koi purani family trip jo yaad aati hai?",
+    "Aaj kisi ne aapki madad ki? Kisne?","Kaunsi chhoti si cheez ne aaj mood accha kar diya?","Agli baar sab milein toh kya banna chahiye?",
+    "Koi movie ya show jo sabko dekhna chahiye?","Bachpan ka favourite tiffin kya hota tha?","Is mahine kya naya seekha?",
+    "Is saal kaunsa ek plan poora karna hai?","Ghar ki kaunsi baat sabse zyada miss karte ho?","Aaj chai thi ya coffee? Kitni baar?",
+    "Kis tyohar ka sabse zyada intezaar rehta hai?","Bachpan ki koi mazedaar baat jo aaj yaad aa gayi?","Weekend ka kya plan hai?",
+    "Ghar ka kaunsa kona sabse pasand hai, aur kyun?","Koi aisi aadat jo kisi family member se seekhi?","Aaj ka mausam kaisa tha aapke yahan?",
+    "Kaunsi family photo aapki favourite hai?"
+  ];
+  const sawaalFor = k => { const n = Math.floor(parseDay(k).getTime()/864e5); return SAWAAL[((n % SAWAAL.length) + SAWAAL.length) % SAWAAL.length]; };
+
+  // Relation labels, grouped for the picker
+  const REL_GROUPS = [
+    ["Ghar", ["Maa","Mummy","Papa","Didi","Bhaiya","Behen","Bhai","Beta","Beti","Pati","Patni"]],
+    ["Bade", ["Dadi","Dada","Nani","Nana","Chacha","Chachi","Tau","Tai","Bua","Fufa","Mama","Mami","Mausi","Mausa"]],
+    ["Sasural", ["Saas","Sasur","Bahu","Damad","Jija","Bhabhi","Devar","Nanad","Saala","Saali"]],
+    ["Chhote", ["Pota","Poti","Nati","Natin","Bhatija","Bhatiji","Bhanja","Bhanji"]],
+    ["Aur", ["Dost"]]
+  ];
+  // If A calls B "<label>", what is A to B? Depends on A's gender (m/f).
+  const INV = {};
+  const inv = (labels, m, f) => labels.forEach(l => INV[l] = { m, f });
+  inv(["Maa","Mummy","Papa"], "Beta", "Beti");
+  inv(["Beta","Beti"], "Papa", "Maa");
+  inv(["Didi","Bhaiya","Behen","Bhai"], "Bhai", "Behen");
+  inv(["Pati"], null, "Patni"); inv(["Patni"], "Pati", null);
+  inv(["Saas","Sasur"], "Damad", "Bahu");
+  inv(["Bahu","Damad"], "Sasur", "Saas");
+  inv(["Dada","Dadi"], "Pota", "Poti"); inv(["Pota","Poti"], "Dada", "Dadi");
+  inv(["Nana","Nani"], "Nati", "Natin"); inv(["Nati","Natin"], "Nana", "Nani");
+  inv(["Chacha","Chachi","Tau","Tai","Bua","Fufa"], "Bhatija", "Bhatiji");
+  inv(["Mama","Mami","Mausi","Mausa"], "Bhanja", "Bhanji");
+  inv(["Bhanja","Bhanji"], "Mama", "Mausi");
+  inv(["Jija"], "Saala", "Saali"); inv(["Saala","Saali"], "Jija", null);
+  inv(["Bhabhi"], "Devar", "Nanad"); inv(["Devar","Nanad"], null, "Bhabhi");
+  inv(["Dost"], "Dost", "Dost");
+  const inverseOf = (label, ownerGender) => { const e = INV[label]; return e && ownerGender ? e[ownerGender] : null; };
+
+  const COLORS = ["#A35A00","#064F6E","#6E5F10","#1F6F93","#7A4A00","#4A4010"];
+
+  /* ================= state ================= */
+  const cfg = window.FAMILY_CONFIG || {};
+  const S = {
+    sb:null, fam:null, members:[], rel:{}, relIn:[], me: ls.get("fkd-me"),
+    mode: ["dil","parivaar"].includes(ls.get("fkd-mode")) ? ls.get("fkd-mode") : "photos",
+    day: todayKey(), posts:[], conf:[], reacts:[], preacts:[], comments:[], doodles:[], view:"timeline", filter:"all",
+    loading:true, offline:false, poll:null, reqId:0, started:false
+  };
+  const member = id => S.members.find(m => m.id === id);
+  const meM = () => member(S.me);
+  const mName = id => (member(id)?.name) || "Koi";
+  const mRel = id => (id && id !== S.me) ? (S.rel[id] || "") : "";
+  const mLabel = id => id === S.me ? "Aap" : (mRel(id) || mName(id));
+  const mColor = id => (member(id)?.color) || "#6B6450";
+  const initial = n => (String(n||"?").trim()[0] || "?").toUpperCase();
+  const others = () => S.members.filter(m => m.id !== S.me);
+  const photoUrl = path => S.sb.storage.from("photos").getPublicUrl(path).data.publicUrl;
+  // Untrusted drawing data from the database: only allow plain path syntax.
+  const okPath = d => typeof d === "string" && d.length < 20000 && /^[MQTLCZmqtlcz0-9 ,.\-]+$/.test(d);
+  const okColor = c => typeof c === "string" && /^#[0-9a-fA-F]{6}$/.test(c);
+  const okVb = v => typeof v === "string" && /^\d{1,4} \d{1,5}$/.test(v);
+  const markSVG = m => { const d = (m?.mark?.d || []).filter(okPath); return d.length ? `<svg class="mark" viewBox="0 0 100 100" aria-hidden="true">${d.map(x => `<path d="${x}" fill="#fff"/>`).join("")}</svg>` : ""; };
+  const avaInner = id => { const m = member(id); return markSVG(m) || esc(initial(m ? m.name : "?")); };
+  const dotHTML = id => `<span class="dot" style="background:${esc(mColor(id))}">${avaInner(id)}</span>`;
+  const whoHTML = id => `<span class="nm">${dotHTML(id)}${esc(mName(id))}${mRel(id)?`<span class="rel">· ${esc(mRel(id))}</span>`:""}</span>`;
+
+  /* ---------- hand-drawn bits ---------- */
+  const PHOTO_STAMPS = [["wah","Wah!"],["nazar","Nazar na lage"],["bhook","Bhook lag gayi"],["shabaash","Shabaash"],["dil","Dil se"]];
+  const seedOf = s => { let h = 7; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return (h % 9999) + 1; };
+  function decorateStamps(root){
+    if (!window.rough) return;
+    (root || document).querySelectorAll(".stamp:not([data-inked])").forEach(b => {
+      const w = b.offsetWidth, h = b.offsetHeight; if (!w) return;
+      const NS = "http://www.w3.org/2000/svg", svg = document.createElementNS(NS, "svg");
+      const on = b.getAttribute("aria-pressed") === "true";
+      svg.setAttribute("class", "ink" + (on ? " on" : "")); svg.setAttribute("width", w + 8); svg.setAttribute("height", h + 8);
+      svg.setAttribute("viewBox", `0 0 ${w + 8} ${h + 8}`); svg.setAttribute("aria-hidden", "true");
+      const opts = { roughness:1.5, bowing:2.2, stroke:"currentColor", strokeWidth: on ? 2 : 1.3, seed: seedOf(b.dataset.k + "|" + (b.dataset.id || "")) };
+      if (on) Object.assign(opts, { fill:"currentColor", fillStyle:"hachure", hachureGap:4, fillWeight:0.8, hachureAngle:-35 });
+      svg.appendChild(rough.svg(svg).ellipse((w + 8) / 2, (h + 8) / 2, w + 2, h + 2, opts));
+      b.prepend(svg); b.dataset.inked = "1";
+    });
+  }
+  // perfect-freehand (MIT) loads only when someone starts drawing
+  let PF = null;
+  const loadPF = () => PF || (PF = import("https://cdn.jsdelivr.net/npm/perfect-freehand@1.2.2/dist/esm/index.mjs").catch(e => { PF = null; throw e; }));
+  const avg = (a, b) => (a + b) / 2;
+  function strokePath(pts){ // from the perfect-freehand README
+    const len = pts.length; if (len < 4) return "";
+    let a = pts[0], b = pts[1]; const c = pts[2];
+    let r = `M${a[0].toFixed(0)},${a[1].toFixed(0)} Q${b[0].toFixed(0)},${b[1].toFixed(0)} ${avg(b[0], c[0]).toFixed(0)},${avg(b[1], c[1]).toFixed(0)} T`;
+    for (let i = 2, max = len - 1; i < max; i++) { a = pts[i]; b = pts[i + 1]; r += `${avg(a[0], b[0]).toFixed(0)},${avg(a[1], b[1]).toFixed(0)} `; }
+    return r + "Z";
+  }
+  // Draw with a finger on an <svg> pad. Returns {strokes, undo, clear}.
+  async function drawPad(svg, w, h, opts){
+    const { getStroke } = await loadPF();
+    const strokes = []; let pts = null, live = null;
+    const toXY = e => { const r = svg.getBoundingClientRect(); return [ (e.clientX - r.left) / r.width * w, (e.clientY - r.top) / r.height * h, e.pressure || 0.5 ]; };
+    const make = () => { const p = document.createElementNS("http://www.w3.org/2000/svg", "path"); p.setAttribute("fill", opts.color()); svg.appendChild(p); return p; };
+    const outline = (pts, e) => strokePath(getStroke(pts, { size:opts.size, thinning:0.6, smoothing:0.5, streamline:0.5, simulatePressure: !e || e.pointerType !== "pen" }));
+    let lastE = null;
+    svg.addEventListener("pointerdown", e => { e.preventDefault(); svg.setPointerCapture(e.pointerId); pts = [toXY(e)]; live = make(); lastE = e; });
+    svg.addEventListener("pointermove", e => { if (!pts) return; pts.push(toXY(e)); lastE = e; live.setAttribute("d", outline(pts, e)); });
+    const end = () => { if (!pts) return; const d = outline(pts, lastE); if (d) { live.setAttribute("d", d); strokes.push({ d, c: live.getAttribute("fill"), el: live }); } else live.remove(); pts = null; live = null; opts.onChange && opts.onChange(strokes.length); };
+    svg.addEventListener("pointerup", end); svg.addEventListener("pointercancel", end);
+    return {
+      strokes,
+      undo(){ const s = strokes.pop(); if (s) s.el.remove(); opts.onChange && opts.onChange(strokes.length); },
+      clear(){ while (strokes.length) strokes.pop().el.remove(); opts.onChange && opts.onChange(0); }
+    };
+  }
+  const doodleSVG = dd => okVb(dd.vb) ? `<svg class="dd" viewBox="0 0 ${dd.vb}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${(dd.strokes || []).filter(s => okPath(s.d)).map(s => `<path d="${s.d}" fill="${okColor(s.c) ? s.c : "#FFFFFF"}"/>`).join("")}</svg>` : "";
+
+  function celebrate(){
+    if (!window.confetti) return;
+    const petal = confetti.shapeFromPath({ path: "M5 0 C9 3 9 8 5 12 C1 8 1 3 5 0 Z" });
+    const shot = (x) => confetti({ particleCount: 60, spread: 70, startVelocity: 32, angle: x < .5 ? 60 : 120, origin: { x, y: .35 }, shapes: [petal], scalar: 1.8, gravity: .6, drift: x < .5 ? .4 : -.4, ticks: 320, colors: ["#F99D1B","#FCB315","#F3A257","#F5ECC2"], disableForReducedMotion: true });
+    shot(.1); setTimeout(() => shot(.9), 250);
+  }
+  const annotated = new Set();
+  function annotate(el, key, opts){
+    if (!el || !window.RoughNotation) return;
+    const a = RoughNotation.annotate(el, Object.assign({ animate: !annotated.has(key) }, opts));
+    annotated.add(key); a.show();
+  }
+
+  /* ================= backend ================= */
+  function client(code){
+    return window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey, {
+      global: { headers: { "x-family-code": code || "" } },
+      auth: { persistSession:false, autoRefreshToken:false }
+    });
+  }
+  async function familyFor(code){
+    const sb = client(code);
+    const { data, error } = await sb.rpc("family_info");
+    if (error) throw error;
+    return data ? { sb, fam:data } : null;
+  }
+  async function loadMembers(){
+    const { data, error } = await S.sb.from("members").select("*").order("created_at");
+    if (!error) S.members = data || [];
+    return !error;
+  }
+  async function loadRelations(){
+    if (!S.me) { S.rel = {}; S.relIn = []; return; }
+    const [a, b] = await Promise.all([
+      S.sb.from("relations").select("*").eq("owner", S.me),
+      S.sb.from("relations").select("*").eq("target", S.me)
+    ]);
+    if (!a.error) { S.rel = {}; (a.data||[]).forEach(r => S.rel[r.target] = r.label); }
+    if (!b.error) S.relIn = b.data || [];
+  }
+  async function setRelation(target, label){
+    const { error } = label
+      ? await S.sb.from("relations").upsert({ family_id:S.fam.id, owner:S.me, target, label }, { onConflict:"owner,target" })
+      : await S.sb.from("relations").delete().eq("owner", S.me).eq("target", target);
+    if (error) return false;
+    if (label) S.rel[target] = label; else delete S.rel[target];
+    return true;
+  }
+  async function loadDay(quiet){
+    const id = ++S.reqId, day = S.day;
+    if (!quiet) { S.loading = true; S.posts = []; S.conf = []; S.reacts = []; S.preacts = []; S.comments = []; S.doodles = []; render(); }
+    const [p, c] = await Promise.all([
+      S.sb.from("posts").select("*").eq("day", day).order("ts"),
+      S.sb.from("confessions").select("*").eq("day", day).order("ts")
+    ]);
+    if (id !== S.reqId) return;
+    const none = Promise.resolve({ data:[], error:null });
+    const cids = (c.data || []).map(x => x.id), pids = (p.data || []).map(x => x.id);
+    const [r, pr, cm, dd] = await Promise.all([
+      !c.error && cids.length ? S.sb.from("reactions").select("*").in("confession_id", cids) : none,
+      !p.error && pids.length ? S.sb.from("photo_reactions").select("*").in("post_id", pids) : none,
+      !p.error && pids.length ? S.sb.from("comments").select("*").in("post_id", pids).order("ts") : none,
+      !p.error && pids.length ? S.sb.from("doodles").select("*").in("post_id", pids).order("ts") : none
+    ]);
+    if (id !== S.reqId) return;
+    S.loading = false;
+    if (p.error || c.error) { S.offline = true; render(); return; }
+    S.offline = false; S.posts = p.data || []; S.conf = c.data || []; S.reacts = r.data || [];
+    S.preacts = pr.data || []; S.comments = cm.data || []; S.doodles = dd.data || [];
+    render();
+    if (S.sheetPost && !scrim.hidden) refreshView();
+  }
+
+  /* ================= onboarding ================= */
+  const onb = $("#onb");
+  function showOnb(html){
+    $("#app").hidden = true; onb.hidden = false; onb.innerHTML = html; window.scrollTo(0,0);
+    const f = onb.querySelector("input"); if (f) f.focus();
+  }
+  const stepBar = n => `<div class="steps" aria-hidden="true">${[1,2,3].map(i => `<i class="${i<=n?"on":""}"></i>`).join("")}</div>`;
+
+  function onbWelcome(){
+    showOnb(`
+      <div class="hours" aria-hidden="true">${[3,5,2,6,4,7,3,5,6,2,4,5].map((h,i) => `<i class="${i===9?"acc":i%3===0?"on":""}" style="height:${h*9}px"></i>`).join("")}</div>
+      <h1 class="hero">Family Ka Din</h1>
+      <p class="lead">Ghar ke sab log, din bhar ke chhote pal. Ek photo, ek baat, jab fursat mile.</p>
+      <div class="stack">
+        <button type="button" class="btn go" id="goCreate">Naya parivaar banao</button>
+        <button type="button" class="btn" id="goJoin">Code se parivaar mein judo</button>
+      </div>
+      <p class="small">Kisi ne link bheja hai? Usi link ko kholo, code apne aap aa jayega.</p>`);
+    $("#goCreate").onclick = onbCreate;
+    $("#goJoin").onclick = () => onbJoin("");
+  }
+
+  function onbCreate(){
+    showOnb(`
+      <button type="button" class="back" id="back">‹ Wapas</button>
+      ${stepBar(1)}
+      <h2>Apne parivaar ka naam rakho</h2>
+      <p>Yeh naam sabko upar dikhega. Baad mein badal sakte ho.</p>
+      <form class="stack" id="f">
+        <input class="field" id="fname" maxlength="40" placeholder="Jaise: Sharma Parivaar" aria-label="Parivaar ka naam" autocomplete="off">
+        <button class="btn go" type="submit">Aage badho</button>
+        <p class="err" id="err"></p>
+      </form>`);
+    $("#back").onclick = onbWelcome;
+    $("#f").onsubmit = async e => {
+      e.preventDefault();
+      const name = $("#fname").value.trim(); if (!name) { $("#err").textContent = "Parivaar ka naam likho."; return; }
+      $("#err").textContent = "Bana rahe hain…";
+      try {
+        const { data, error } = await client("").rpc("create_family", { fname:name });
+        if (error || !data) throw error;
+        ls.set("fkd-code", data.code); ls.del("fkd-me"); S.me = null;
+        S.sb = client(data.code); S.fam = data; S.members = [];
+        onbWho(true);
+      } catch { $("#err").textContent = "Parivaar nahi ban paaya. Net check karke dobara try karo."; }
+    };
+  }
+
+  function onbJoin(prefill){
+    showOnb(`
+      <button type="button" class="back" id="back">‹ Wapas</button>
+      ${stepBar(1)}
+      <h2>Parivaar ka code daalo</h2>
+      <p>Yeh 6 akshar ka code parivaar mein kisi ke paas hoga. Parivaar tab mein dikhta hai.</p>
+      <form class="stack" id="f">
+        <input class="field code-in" id="code" maxlength="12" value="${esc(prefill)}" placeholder="K7MPQ2" aria-label="Parivaar ka code" autocomplete="off" autocapitalize="characters">
+        <button class="btn go" type="submit">Judo</button>
+        <p class="err" id="err"></p>
+      </form>`);
+    $("#back").onclick = onbWelcome;
+    $("#f").onsubmit = async e => {
+      e.preventDefault();
+      const code = $("#code").value.trim().toUpperCase(); if (!code) return;
+      $("#err").textContent = "Dhoondh rahe hain…";
+      try {
+        const r = await familyFor(code);
+        if (!r) { $("#err").textContent = "Is code ka koi parivaar nahi mila. Ek baar phir check karo."; return; }
+        ls.set("fkd-code", code); ls.del("fkd-me"); S.me = null;
+        S.sb = r.sb; S.fam = r.fam;
+        await loadMembers();
+        onbWho(false);
+      } catch { $("#err").textContent = "Net nahi mil raha. Thodi der mein dobara try karo."; }
+    };
+  }
+
+  function onbWho(isCreator){
+    const unclaimed = S.members.filter(m => !m.claimed);
+    const claimed = S.members.filter(m => m.claimed);
+    showOnb(`
+      ${stepBar(2)}
+      <h2>${isCreator ? "Aur aap kaun ho?" : `${esc(S.fam.name)} mein swagat hai`}</h2>
+      ${unclaimed.length ? `
+        <div class="stack">
+          <p class="lead">Kisi ne aapko pehle se joda hai? Apna naam chuno:</p>
+          <div class="chips" id="unc">${unclaimed.map(m => `<button type="button" data-id="${esc(m.id)}">${esc(m.name)}</button>`).join("")}</div>
+        </div>
+        <p class="small">Aapka naam nahi hai? Neeche register karo.</p>` : `<p class="lead">Apna naam batao. Parivaar mein sab isi naam se dekhenge.</p>`}
+      <form class="stack" id="f">
+        <label class="lbl" for="nm">Aapka naam</label>
+        <input class="field" id="nm" maxlength="30" placeholder="Jaise: Shiv" autocomplete="given-name">
+        <fieldset class="tags" id="g"><legend>Rishte sahi suggest karne ke liye (optional)</legend>
+          <label><input type="radio" name="g" value="m"><span>Ladka</span></label>
+          <label><input type="radio" name="g" value="f"><span>Ladki</span></label>
+          <label><input type="radio" name="g" value="" checked><span>Rehne do</span></label>
+        </fieldset>
+        <button class="btn go" type="submit">Register karo</button>
+        <p class="err" id="err"></p>
+      </form>
+      ${claimed.length ? `<details><summary class="small">Pehle se registered ho, bas naya phone hai?</summary>
+        <div class="chips" id="cl" style="margin-top:10px">${claimed.map(m => `<button type="button" data-id="${esc(m.id)}">${esc(m.name)}</button>`).join("")}</div></details>` : ""}`);
+    const unc = $("#unc");
+    if (unc) unc.onclick = async e => {
+      const b = e.target.closest("[data-id]"); if (!b) return;
+      const { error } = await S.sb.from("members").update({ claimed:true }).eq("id", b.dataset.id);
+      if (error) { $("#err").textContent = "Nahi ho paaya. Dobara try karo."; return; }
+      S.me = b.dataset.id; ls.set("fkd-me", S.me); await loadMembers(); await loadRelations(); onbRishte();
+    };
+    const cl = $("#cl");
+    if (cl) cl.onclick = async e => {
+      const b = e.target.closest("[data-id]"); if (!b) return;
+      S.me = b.dataset.id; ls.set("fkd-me", S.me); await loadRelations(); startApp();
+    };
+    $("#f").onsubmit = async e => {
+      e.preventDefault();
+      const name = $("#nm").value.trim(); if (!name) { $("#err").textContent = "Apna naam likho."; return; }
+      if (S.members.some(m => m.name.toLowerCase() === name.toLowerCase())) { $("#err").textContent = "Is naam se koi pehle se hai. Thoda alag likho, jaise surname ke saath."; return; }
+      const gender = onb.querySelector("input[name=g]:checked")?.value || null;
+      const row = { id:uid(), family_id:S.fam.id, name, gender, color:COLORS[S.members.length % COLORS.length], claimed:true };
+      const { error } = await S.sb.from("members").insert(row);
+      if (error) { $("#err").textContent = "Register nahi ho paaya. Net check karke dobara try karo."; return; }
+      S.me = row.id; ls.set("fkd-me", S.me); S.members.push(row); await loadRelations();
+      if (others().length) onbRishte(); else startApp("parivaar");
+    };
+  }
+
+  function onbRishte(){
+    const draw = () => {
+      showOnb(`
+        ${stepBar(3)}
+        <h2>Aapke liye kaun kya hai?</h2>
+        <p class="lead">Har kisi ke liye apna rishta chuno. Yeh sirf aapko dikhega: aapki Didi, Mummy ki beti hai.</p>
+        <div class="mrows" id="rl">${others().map(relRowHTML).join("")}</div>
+        <div class="stack">
+          <button type="button" class="btn go" id="done">Ho gaya, app kholo</button>
+          <button type="button" class="linkish" id="skip" style="align-self:center">Baad mein karunga</button>
+        </div>`);
+      $("#rl").onclick = e => { const b = e.target.closest("[data-rel]"); if (b) relSheet(b.dataset.rel, draw); };
+      $("#done").onclick = () => startApp();
+      $("#skip").onclick = () => startApp();
+    };
+    draw();
+  }
+
+  function relRowHTML(m){
+    const r = S.rel[m.id];
+    const given = S.relIn.find(x => x.owner === m.id);
+    const sug = !r && given ? inverseOf(given.label, m.gender) : null;
+    return `<button type="button" class="mrow" data-rel="${esc(m.id)}">
+      <span class="ava" style="background:${esc(m.color)}">${avaInner(m.id)}</span>
+      <span class="info"><strong>${esc(m.name)}</strong>
+        <span>${r ? `Mere liye: <b>${esc(r)}</b>` : sug ? `Suggestion: <b>${esc(sug)}</b>` : "Rishta chuno"}${!m.claimed ? " · abhi juda nahi" : ""}</span></span>
+      <span class="chev" aria-hidden="true">›</span></button>`;
+  }
+
+  /* ================= boot ================= */
+  async function boot(){
+    if (!window.supabase || !cfg.supabaseUrl || cfg.supabaseUrl.includes("YOUR-PROJECT")) {
+      showOnb(`<h1 class="hero">Family Ka Din</h1><p class="lead">App abhi set up nahi hua hai. config.js mein Supabase ka URL aur key daalo (README dekho).</p>`);
+      return;
+    }
+    let join = null;
+    try { join = new URLSearchParams(location.search).get("join"); } catch {}
+    const code = ls.get("fkd-code");
+    if (join && (!code || join.toUpperCase() !== code)) {
+      try { history.replaceState(null, "", location.pathname); } catch {}
+      return onbJoin(join.toUpperCase());
+    }
+    if (!code) return onbWelcome();
+    try {
+      const r = await familyFor(code);
+      if (!r) { ls.del("fkd-code"); ls.del("fkd-me"); return onbWelcome(); }
+      S.sb = r.sb; S.fam = r.fam;
+      await loadMembers();
+      const me = meM();
+      if (!me) { S.me = null; ls.del("fkd-me"); return onbWho(false); }
+      await loadRelations();
+      startApp();
+    } catch {
+      showOnb(`<h1 class="hero">Family Ka Din</h1><p class="lead">Net nahi mil raha.</p><button type="button" class="btn go" id="retry">Dobara try karo</button>`);
+      $("#retry").onclick = boot;
+    }
+  }
+
+  function startApp(mode){
+    if (mode) { S.mode = mode; ls.set("fkd-mode", mode); }
+    onb.hidden = true; $("#app").hidden = false;
+    $("#famName").textContent = S.fam.name;
+    loadDay();
+    if (!S.started) {
+      S.started = true;
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => render());
+      S.poll = setInterval(() => { if (!document.hidden && !$("#app").hidden) loadDay(true); }, 30000);
+      document.addEventListener("visibilitychange", async () => {
+        if (document.hidden || $("#app").hidden) return;
+        await loadMembers(); await loadRelations(); loadDay(true);
+      });
+      new ResizeObserver(() => document.documentElement.style.setProperty("--hdr", $("#hdr").offsetHeight + "px")).observe($("#hdr"));
+    }
+  }
+
+  /* ================= render ================= */
+  function renderHeader(){
+    const me = meM();
+    $("#meDot").style.background = me ? me.color : "var(--muted)";
+    $("#meDot").innerHTML = me ? avaInner(me.id) : "?";
+    $("#meName").textContent = me ? me.name : "";
+    const d = parseDay(S.day), isToday = S.day === todayKey();
+    const yest = S.day === shiftDay(todayKey(), -1);
+    $("#dayTitle").textContent = isToday ? "Aaj" : yest ? "Kal" : VAAR[d.getDay()];
+    $("#daySub").textContent = `${VAAR[d.getDay()]}, ${d.getDate()} ${MON[d.getMonth()]}`;
+    $("#nextDay").disabled = isToday;
+    $("#mPhotos").setAttribute("aria-pressed", S.mode==="photos");
+    $("#mDil").setAttribute("aria-pressed", S.mode==="dil");
+    $("#mFam").setAttribute("aria-pressed", S.mode==="parivaar");
+
+    const fam = S.mode === "parivaar", dil = S.mode === "dil";
+    $("#daynav").hidden = fam; $("#who").hidden = fam;
+    $("#seg").hidden = dil || fam;
+    $("#addBtn").textContent = fam ? "+ Kisi ko parivaar mein jodo" : dil ? "+ Dil ki baat likho" : "+ Photo";
+    $("#addBtn").classList.toggle("wide", dil || fam);
+    $("#vTimeline").setAttribute("aria-pressed", S.view==="timeline");
+    $("#vCollage").setAttribute("aria-pressed", S.view==="collage");
+    if (fam) return;
+
+    const items = dil ? S.conf : S.posts;
+    const counts = {}; let gupt = 0;
+    items.forEach(p => { if (p.member) counts[p.member] = (counts[p.member]||0)+1; else gupt++; });
+    let h = `<button type="button" data-act="filter" data-k="all" class="${S.filter==="all"?"on":""}" aria-pressed="${S.filter==="all"}"><span class="ava all">Sab</span>${items.length} ${dil?(items.length===1?"baat":"baatein"):"photo"}</button>`;
+    const ordered = [...S.members.filter(m => m.id === S.me), ...others()];
+    ordered.forEach(m => {
+      const n = counts[m.id]||0, on = S.filter===m.id;
+      h += `<button type="button" data-act="filter" data-k="${esc(m.id)}" class="${on?"on":""}" aria-pressed="${on}"><span class="ava ${n?"done":""}" style="background:${esc(m.color)}">${avaInner(m.id)}${n?`<span class="n">${n}</span>`:""}</span>${esc(mLabel(m.id))}</button>`;
+    });
+    if (dil && gupt) {
+      const on = S.filter === "gupt";
+      h += `<button type="button" data-act="filter" data-k="gupt" class="${on?"on":""}" aria-pressed="${on}"><span class="ava gupt done">?<span class="n">${gupt}</span></span>Gupt</button>`;
+    }
+    $("#who").innerHTML = h;
+  }
+
+  function renderNotes(){
+    $("#notes").innerHTML = S.offline && S.mode !== "parivaar" ? `<p class="note">Net nahi mil raha, isliye naya kuch nahi dikh raha. Net aate hi khud update ho jayega.</p>` : "";
+  }
+
+  const byFilter = list => S.filter==="all" ? list : S.filter==="gupt" ? list.filter(p => !p.member) : list.filter(p => p.member === S.filter);
+  const img = (p, alt) => `<img src="${esc(photoUrl(p.path))}" alt="${esc(alt)}" loading="lazy" data-fail>`;
+
+  function photoSummary(p){
+    const rx = S.preacts.filter(r => r.post_id === p.id);
+    const bits = PHOTO_STAMPS.map(([k, l]) => { const n = rx.filter(r => r.kind === k).length; return n ? `<span>${esc(l)}<b>${n}</b></span>` : ""; }).filter(Boolean);
+    const nc = S.comments.filter(c => c.post_id === p.id).length;
+    const nd = S.doodles.filter(d => d.post_id === p.id).length;
+    if (nc) bits.push(`<span>${nc} ${nc === 1 ? "jawab" : "jawab"}</span>`);
+    if (nd) bits.push(`<span>${nd} doodle</span>`);
+    return bits.length ? `<div class="psum">${bits.join("")}</div>` : "";
+  }
+  function photoHTML(p, alt){
+    return `<span class="pw">${img(p, alt)}${S.doodles.filter(d => d.post_id === p.id && !S.hideDoodles).map(doodleSVG).join("")}</span>`;
+  }
+  function cardHTML(p){
+    return `<button type="button" class="card" data-act="open" data-id="${esc(p.id)}">
+      ${photoHTML(p, `${TAGS[p.tag]||"Pal"}, ${mName(p.member)}`)}
+      <div class="meta">${whoHTML(p.member)}<span class="tag t-${esc(p.tag||"pal")}">${esc(TAGS[p.tag]||"Pal")}</span><time>${tstr(p.ts)}</time></div>
+      ${p.caption?`<p class="cap">${esc(p.caption)}</p>`:""}${photoSummary(p)}<div class="pad"></div></button>`;
+  }
+
+  function chitHTML(c, i){
+    const tilt = [-0.8, 0.6, -0.4, 0.9][i % 4];
+    const who = c.member ? whoHTML(c.member) : `<span class="nm"><span class="dot gupt">?</span>Gupt</span>`;
+    const rx = S.reacts.filter(r => r.confession_id === c.id);
+    const canDel = (c.member && c.member === S.me) || mine.has(c.id);
+    const btns = REACTS.map(([k, label]) => {
+      const n = rx.filter(r => r.kind === k).length;
+      const meOn = rx.some(r => r.kind === k && r.member === S.me);
+      return `<button type="button" class="stamp" data-act="react" data-id="${esc(c.id)}" data-k="${k}" aria-pressed="${meOn}"><span>${label}${n?`<b>${n}</b>`:""}</span></button>`;
+    }).join("");
+    const md = MOODS[c.mood] || MOODS.yunhi;
+    const label = c.mood === "custom" ? (c.mood_label || "Kuch aur") : md[0];
+    return `<article class="chit c-${md[1]}" style="--tilt:${tilt}deg">
+      <div class="chit-top">${who}<span class="mood">${esc(label)}</span><time>${tstr(c.ts)}</time></div>
+      ${c.prompt?`<p class="chit-q">Aaj ka sawaal: ${esc(c.prompt)}</p>`:""}
+      <p class="chit-body">${esc(c.body)}</p>
+      <div class="reacts">${btns}${canDel?`<button type="button" class="del" data-act="delchit" data-id="${esc(c.id)}">Hatao</button>`:""}</div>
+    </article>`;
+  }
+
+  function timelineOf(list, cardFn, nowText){
+    const isToday = S.day === todayKey();
+    const groups = {};
+    list.forEach(p => { const h = new Date(p.ts).getHours(); (groups[h] = groups[h] || []).push(p); });
+    const rows = Object.keys(groups).map(Number).map(h => ({ h, key:h, items:groups[h] }));
+    const nowH = new Date().getHours();
+    if (isToday) rows.push({ h:nowH, key:nowH+0.5, now:true });
+    rows.sort((a,b) => a.key-b.key);
+    if (!rows.length) return "";
+    const nobody = !list.length && !S.loading;
+    let i = 0;
+    return `<div class="timeline">${rows.map(r => r.now ? `
+      <section class="hour now">
+        <div class="rail"><span class="num">${h12(r.h)}</span><span class="ap">${ap(r.h)}</span><span class="tod">abhi</span></div>
+        <div class="cards"><button type="button" class="nowbox" data-act="add">
+          <strong>${nobody ? nowText[0] : nowText[1]}</strong><span>${nowText[2]}</span></button></div>
+      </section>` : `
+      <section class="hour">
+        <div class="rail"><span class="num">${h12(r.h)}</span><span class="ap">${ap(r.h)}</span><span class="tod">${tod(r.h)}</span></div>
+        <div class="cards">${r.items.map(x => cardFn(x, i++)).join("")}</div>
+      </section>`).join("")}</div>`;
+  }
+
+  function everyonePosted(){
+    const joined = S.members.filter(m => m.claimed);
+    return S.day === todayKey() && joined.length >= 2 && joined.every(m => S.posts.some(p => p.member === m.id));
+  }
+  function renderPhotos(){
+    const cele = installCard(true) + (everyonePosted() ? `<p class="cele"><span id="celeTxt">Aaj poore parivaar ne photo daali!</span></p>` : "");
+    if (S.view === "collage") return cele + renderCollage();
+    const list = byFilter(S.posts);
+    const t = timelineOf(list, cardHTML, ["Aaj ki pehli photo aap daalo","Is waqt kya chal raha hai?","Kaam, khana, ya bas koi pal. Jab fursat mile, ek photo."]);
+    return cele + (t || `<p class="empty">${S.loading ? "Load ho raha hai…" : S.filter==="all" ? "Is din koi photo nahi daali gayi." : `${esc(mLabel(S.filter))} ne is din koi photo nahi daali.`}</p>`);
+  }
+
+  function renderDil(){
+    const list = byFilter(S.conf);
+    const head = `<button type="button" class="sawaal" data-act="sawaal"><small>Aaj ka sawaal</small><strong>${esc(sawaalFor(S.day))}</strong><span>Mann ho toh jawab likho, warna bas padh lo.</span></button>`;
+    const t = timelineOf(list, chitHTML, ["Aaj ki pehli dil ki baat aap likho","Kuch dil mein hai?","Yaadein, khushkhabri, shikayat, ya bas yunhi. Naam ke saath ya gupt."]);
+    return head + (t || `<p class="empty">${S.loading ? "Load ho raha hai…" : "Is din kisi ne kuch nahi likha."}</p>`);
+  }
+
+  function renderCollage(){
+    const all = [...S.members.filter(m => m.id === S.me), ...others()];
+    const ms = S.filter==="all" ? all : all.filter(m => m.id===S.filter);
+    if (!ms.length) return `<p class="empty">${S.loading ? "Load ho raha hai…" : "Parivaar tab se logon ko jodo."}</p>`;
+    return `<div class="collage">${ms.map(m => {
+      const ps = S.posts.filter(p => p.member === m.id);
+      const title = m.id === S.me ? "Aapka din" : `${esc(mLabel(m.id))} ka din`;
+      return `<section>
+        <div class="cl-head">${dotHTML(m.id)}<h3>${title}</h3><span class="cnt">${ps.length} photo</span></div>
+        ${ps.length ? `<div class="grid">${ps.map(p => `<button type="button" class="tile" data-act="open" data-id="${esc(p.id)}" aria-label="${esc((TAGS[p.tag]||"Pal")+", "+tstr(p.ts))}">
+          ${img(p, (TAGS[p.tag]||"Pal")+", "+m.name)}<span class="stamp">${tstr(p.ts)} ${ap(new Date(p.ts).getHours())}</span><span class="tg bg-${esc(p.tag||"pal")}"></span></button>`).join("")}</div>`
+        : `<p class="cl-none">Abhi tak kuch nahi daala.</p>`}
+      </section>`;
+    }).join("")}</div>`;
+  }
+
+  /* ---------- install as app ---------- */
+  let installEvt = null;
+  const isStandalone = () => !!(navigator.standalone || (window.matchMedia && matchMedia("(display-mode: standalone)").matches));
+  const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; render(); });
+  window.addEventListener("appinstalled", () => { installEvt = null; ls.set("fkd-installed", "1"); render(); });
+  const showInstall = () => !isStandalone() && ls.get("fkd-installed") !== "1";
+  function installCard(dismissable){
+    if (!showInstall()) return "";
+    if (dismissable && ls.get("fkd-install-x") === "1") return "";
+    return `<div class="install"><img src="icon-192.png" alt="" onerror="this.remove()"><div><strong>App ki tarah install karo</strong><span>Home screen pe icon aa jayega, bina browser ke khulega.</span></div>
+      <button type="button" class="btn go" data-act="install">Install</button>${dismissable ? `<button type="button" class="x" data-act="installx" aria-label="Band karo">×</button>` : ""}</div>`;
+  }
+  async function doInstall(){
+    if (installEvt) {
+      installEvt.prompt();
+      try { const r = await installEvt.userChoice; if (r.outcome === "accepted") ls.set("fkd-installed", "1"); } catch {}
+      installEvt = null; render(); return;
+    }
+    const ios = isIOS();
+    openSheet(`<h2>App install karo</h2>
+      ${ios ? `<ol class="steps-list">
+          <li>Yeh page <b>Safari</b> mein kholo.</li>
+          <li>Neeche <b>Share</b> button dabao (dabba jisme upar teer hai).</li>
+          <li>Neeche scroll karke <b>Add to Home Screen</b> chuno, phir <b>Add</b>.</li>
+          <li>Ab home screen pe Family Ka Din ke icon se kholo. Reminder bhi tabhi chalenge.</li></ol>`
+        : `<ol class="steps-list">
+          <li>Yeh page <b>Chrome</b> mein kholo.</li>
+          <li>Upar daayein <b>⋮</b> (teen bindu) dabao.</li>
+          <li><b>Install app</b> ya <b>Add to Home screen</b> chuno, phir <b>Install</b>.</li>
+          <li>Ab app drawer ya home screen se Family Ka Din kholo.</li></ol>`}
+      <button type="button" class="btn" data-close>Samajh gaya</button>`);
+    sheet.querySelector("[data-close]").onclick = closeSheet;
+  }
+
+  const REMIND = [["Band", null], ["Subah 9", 9], ["Dopahar 1", 13], ["Shaam 6", 18], ["Raat 9", 21]];
+  const inviteLink = () => `${location.origin}${location.pathname}?join=${encodeURIComponent(S.fam.code)}`;
+
+  function renderParivaar(){
+    const me = meM();
+    const link = inviteLink();
+    const wa = "https://wa.me/?text=" + encodeURIComponent(`${S.fam.name} mein judo! Family Ka Din app kholo: ${link}\nCode: ${S.fam.code}`);
+    const sugg = S.relIn.map(r => {
+      const owner = member(r.owner); if (!owner || S.rel[owner.id]) return null;
+      const s = inverseOf(r.label, owner.gender); if (!s) return null;
+      return { owner, given:r.label, s };
+    }).filter(Boolean);
+    const joined = others().filter(m => m.claimed), waiting = others().filter(m => !m.claimed);
+    return `<div class="fam">
+      ${installCard(false)}
+      <section class="invite">
+        <small>Parivaar ka code</small>
+        <div class="code">${esc(S.fam.code)}</div>
+        <p>Yeh code ya link bhejo. Jo bhi kholega, ${esc(S.fam.name)} mein jud jayega.</p>
+        <div class="row"><a class="wa" href="${esc(wa)}" target="_blank" rel="noopener">WhatsApp pe bhejo</a><button type="button" data-act="copylink">Link copy karo</button></div>
+      </section>
+
+      ${sugg.map(x => `<section class="sugg">
+        <p><b>${esc(x.owner.name)}</b> ne aapko <b>${esc(x.given)}</b> kaha hai. Aapke liye ${esc(x.owner.name)}: <b>${esc(x.s)}</b>?</p>
+        <div class="row"><button type="button" class="btn pri" data-act="acceptrel" data-id="${esc(x.owner.id)}" data-l="${esc(x.s)}">Haan, ${esc(x.s)}</button><button type="button" class="btn" data-act="relpick" data-id="${esc(x.owner.id)}">Kuch aur</button></div>
+      </section>`).join("")}
+
+      ${!me.mark ? `<button type="button" class="nudge" data-act="drawmark"><span class="ava" style="background:${esc(me.color)};outline:0">${esc(initial(me.name))}</span><span><strong>Apna nishaan banao</strong><span>Ungli se kuch bhi bana do: signature, dil, chashma. Har jagah aapke naam ke saath yahi dikhega.</span></span></button>` : ""}
+
+      <section class="sec">
+        <h3>Aap</h3>
+        <div class="mrows"><button type="button" class="mrow" data-act="editme">
+          <span class="ava" style="background:${esc(me.color)}">${avaInner(me.id)}</span>
+          <span class="info"><strong>${esc(me.name)}</strong><span>Naam, nishaan ya jaankari badlo</span></span>
+          <span class="chev" aria-hidden="true">›</span></button></div>
+      </section>
+
+      <section class="sec">
+        <h3>Mera parivaar</h3>
+        <p>Har kisi ke aage apna rishta likho. Yeh sirf aapke phone pe aapko dikhega, baaki sab apna-apna rakhenge.</p>
+        ${joined.length ? `<div class="mrows">${joined.map(m => relRowHTML(m).replace('data-rel=', 'data-act="relpick" data-id=')).join("")}</div>` : `<p class="small">Abhi aur koi nahi juda. Upar se code bhejo.</p>`}
+      </section>
+
+      ${waiting.length ? `<section class="sec">
+        <h3>Abhi juda nahi</h3>
+        <p>Inhe aapne ya kisi aur ne pehle se joda hai. Jab yeh app kholenge, apna naam chun lenge.</p>
+        <div class="mrows">${waiting.map(m => relRowHTML(m).replace('data-rel=', 'data-act="relpick" data-id=')).join("")}</div>
+      </section>` : ""}
+
+      <section class="sec">
+        <h3>Roz yaad dilao</h3>
+        <p>Agar tab tak aapne kuch nahi daala, ek chhota sa message aayega, aapke rishton ke saath: "Mummy ne aaj 2 photo daali…"</p>
+        <div class="chips">${REMIND.map(([l, h]) => `<button type="button" data-act="remind" data-h="${h ?? ""}" aria-pressed="${(me.remind_at ?? null) === h}">${l}</button>`).join("")}</div>
+        <p class="small" id="rnote" style="margin-top:8px">${esc(S.remindNote || "")}</p>
+      </section>
+
+      <section class="foot">
+        <button type="button" class="linkish" data-act="renamefam">Parivaar ka naam badlo</button>
+        <button type="button" class="linkish" data-act="switchuser">Is phone pe koi aur hai? User badlo</button>
+        <button type="button" class="linkish" data-act="leavefam">Doosre parivaar mein jao</button>
+        <button type="button" class="linkish" data-act="leaveself" style="color:var(--error)">Parivaar chhodo aur apna naam hatao</button>
+      </section>
+    </div>`;
+  }
+
+  function render(){
+    if (!S.sb || $("#app").hidden) return;
+    renderHeader(); renderNotes();
+    $("#main").innerHTML = S.mode === "parivaar" ? renderParivaar() : S.mode === "dil" ? renderDil() : renderPhotos();
+    decorateStamps($("#main"));
+    if (S.mode === "parivaar") annotate($(".invite .code"), "code", { type:"circle", color:"#F99D1B", strokeWidth:2, padding:[6,14], iterations:2 });
+    const ct = $("#celeTxt");
+    if (ct) {
+      annotate(ct, "cele" + S.day, { type:"highlight", color:"rgba(249,157,27,.35)", iterations:1, multiline:true });
+      const k = "fkd-cele-" + S.day + "-" + S.fam.id;
+      if (!ls.get(k)) { ls.set(k, "1"); celebrate(); }
+    }
+    document.querySelectorAll("img[data-fail]").forEach(i => i.addEventListener("error", () => {
+      const d = document.createElement("div"); d.className = "imgfail"; d.textContent = "Photo nahi khul paayi";
+      i.replaceWith(d);
+    }, { once:true }));
+  }
+
+  /* ================= sheets ================= */
+  const scrim = $("#scrim"), sheet = $("#sheet");
+  let lastFocus = null;
+  function openSheet(html){
+    lastFocus = document.activeElement;
+    sheet.innerHTML = html; scrim.hidden = false;
+    const f = sheet.querySelector("textarea, input:not([type=radio]):not([type=checkbox]), button"); if (f) f.focus();
+  }
+  function closeSheet(){ S.sheetPost = null; scrim.hidden = true; sheet.innerHTML = ""; if (lastFocus && document.contains(lastFocus)) lastFocus.focus(); }
+  scrim.addEventListener("click", e => { if (e.target === scrim) { S.sheetPost = null; closeSheet(); return; } const t = e.target.closest("[data-vact]"); if (t) viewAction(t); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !scrim.hidden) closeSheet(); });
+
+  function relSheet(id, after){
+    const m = member(id); if (!m) return;
+    const cur = S.rel[id] || "";
+    const given = S.relIn.find(x => x.owner === id);
+    const sug = given ? inverseOf(given.label, m.gender) : null;
+    const known = REL_GROUPS.flatMap(g => g[1]);
+    openSheet(`<h2>${esc(m.name)} aapke liye kaun hai?</h2>
+      <p class="small">Sirf aapko dikhega.${given ? ` ${esc(m.name)} ne aapko <b>${esc(given.label)}</b> kaha hai.` : ""}</p>
+      ${sug ? `<div class="chips"><button type="button" class="sug" data-l="${esc(sug)}" aria-pressed="${cur===sug}">${esc(sug)} (suggestion)</button></div>` : ""}
+      ${REL_GROUPS.map(([g, ls_]) => `<p class="grp">${g}</p><div class="chips">${ls_.map(l => `<button type="button" data-l="${esc(l)}" aria-pressed="${cur===l}">${esc(l)}</button>`).join("")}</div>`).join("")}
+      <p class="grp">Apna naam do</p>
+      <form class="row" id="cf"><input class="field" id="cl" maxlength="24" placeholder="Jaise: Chhutki, Jaan, Guruji" value="${esc(cur && !known.includes(cur) ? cur : "")}" aria-label="Apna rishta likho"><button class="btn" type="submit" style="flex:none">Rakho</button></form>
+      <p class="err" id="rErr"></p>
+      <div class="row">${cur?`<button type="button" class="btn warn" id="clr">Rishta hatao</button>`:""}<button type="button" class="btn" data-close>Band karo</button></div>
+      ${!m.claimed ? `<button type="button" class="linkish" id="rm" style="align-self:center">${esc(m.name)} ko list se hatao</button>`
+        : `<button type="button" class="linkish" id="rmc" style="align-self:center;color:var(--error)">${esc(m.name)} ko parivaar se hatao</button>`}`);
+    const rmc = $("#rmc");
+    if (rmc) rmc.onclick = () => confirmSheet(`${esc(m.name)} ko hatana hai?`, "Unki saari photos, comments aur doodles bhi hat jayenge, aur unki dil ki baatein Gupt ban jayengi. Yeh wapas nahi hoga.", "Haan, hatao", async () => {
+      const { error } = await S.sb.from("members").delete().eq("id", id);
+      if (!error) { S.members = S.members.filter(x => x.id !== id); delete S.rel[id]; loadDay(true); }
+      render();
+    });
+    const save = async label => {
+      if (!(await setRelation(id, label))) { $("#rErr").textContent = "Save nahi hua. Dobara try karo."; return; }
+      closeSheet(); after ? after() : render();
+    };
+    sheet.querySelectorAll("[data-l]").forEach(b => b.onclick = () => save(b.dataset.l));
+    $("#cf").onsubmit = e => { e.preventDefault(); const v = $("#cl").value.trim(); if (v) save(v); };
+    const clr = $("#clr"); if (clr) clr.onclick = () => save(null);
+    sheet.querySelector("[data-close]").onclick = closeSheet;
+    const rm = $("#rm");
+    if (rm) { let armed = false; rm.onclick = async () => {
+      if (!armed) { armed = true; rm.textContent = "Pakka hatana hai?"; return; }
+      const { error } = await S.sb.from("members").delete().eq("id", id).eq("claimed", false);
+      if (error) { $("#rErr").textContent = "Hata nahi paaye."; return; }
+      S.members = S.members.filter(x => x.id !== id); closeSheet(); after ? after() : render();
+    }; }
+  }
+
+  function addMemberSheet(){
+    openSheet(`<h2>Kisi ko parivaar mein jodo</h2>
+      <p class="small">Unka naam pehle se jod do. Jab woh code se judenge, bas apna naam chun lenge. Chaho toh unhe seedha code bhej do.</p>
+      <form class="stack" id="af" style="display:flex;flex-direction:column;gap:12px">
+        <input class="field" id="an" maxlength="30" placeholder="Naam, jaise: Rohit" aria-label="Naam">
+        <fieldset class="tags"><legend>Optional</legend>
+          <label><input type="radio" name="ag" value="m"><span>Ladka</span></label>
+          <label><input type="radio" name="ag" value="f"><span>Ladki</span></label>
+          <label><input type="radio" name="ag" value="" checked><span>Rehne do</span></label>
+        </fieldset>
+        <p class="err" id="aErr"></p>
+        <div class="row"><button type="button" class="btn" data-close>Rehne do</button><button type="submit" class="btn pri">Jodo, phir rishta chuno</button></div>
+      </form>`);
+    sheet.querySelector("[data-close]").onclick = closeSheet;
+    $("#af").onsubmit = async e => {
+      e.preventDefault();
+      const name = $("#an").value.trim(); if (!name) return;
+      if (S.members.some(m => m.name.toLowerCase() === name.toLowerCase())) { $("#aErr").textContent = "Is naam se koi pehle se hai."; return; }
+      const gender = sheet.querySelector("input[name=ag]:checked")?.value || null;
+      const row = { id:uid(), family_id:S.fam.id, name, gender, color:COLORS[S.members.length % COLORS.length], claimed:false, added_by:S.me };
+      const { error } = await S.sb.from("members").insert(row);
+      if (error) { $("#aErr").textContent = "Nahi jud paaya. Dobara try karo."; return; }
+      S.members.push(row); closeSheet(); render(); relSheet(row.id);
+    };
+  }
+
+  function editMeSheet(){
+    const me = meM();
+    openSheet(`<h2>Aapki jaankari</h2>
+      <form id="ef" style="display:flex;flex-direction:column;gap:12px">
+        <input class="field" id="en" maxlength="30" value="${esc(me.name)}" aria-label="Aapka naam">
+        <fieldset class="tags"><legend>Rishte suggest karne ke liye</legend>
+          <label><input type="radio" name="eg" value="m" ${me.gender==="m"?"checked":""}><span>Ladka</span></label>
+          <label><input type="radio" name="eg" value="f" ${me.gender==="f"?"checked":""}><span>Ladki</span></label>
+          <label><input type="radio" name="eg" value="" ${!me.gender?"checked":""}><span>Rehne do</span></label>
+        </fieldset>
+        <button type="button" class="btn" id="em">${me.mark ? "Nishaan dobara banao" : "Apna nishaan banao"}</button>
+        <p class="err" id="eErr"></p>
+        <div class="row"><button type="button" class="btn" data-close>Rehne do</button><button type="submit" class="btn pri">Save karo</button></div>
+      </form>`);
+    $("#em").onclick = markSheet;
+    sheet.querySelector("[data-close]").onclick = closeSheet;
+    $("#ef").onsubmit = async e => {
+      e.preventDefault();
+      const name = $("#en").value.trim(); if (!name) return;
+      const gender = sheet.querySelector("input[name=eg]:checked")?.value || null;
+      const { error } = await S.sb.from("members").update({ name, gender }).eq("id", me.id);
+      if (error) { $("#eErr").textContent = "Save nahi hua."; return; }
+      me.name = name; me.gender = gender; closeSheet(); render();
+    };
+  }
+
+  function markSheet(){
+    const me = meM();
+    openSheet(`<h2>Apna nishaan banao</h2>
+      <p class="small">Gol ke andar ungli se kuch bhi bana do. Yeh har jagah aapke naam ke saath dikhega.</p>
+      <div class="markpad" style="background:${esc(me.color)}"><svg id="mpad" viewBox="0 0 100 100" aria-label="Nishaan banane ki jagah"></svg></div>
+      <div class="row"><button type="button" class="btn" id="mu">Undo</button><button type="button" class="btn" id="mc">Mita do</button></div>
+      <p class="err" id="mErr"></p>
+      <div class="row"><button type="button" class="btn" data-close>Rehne do</button><button type="button" class="btn pri" id="ms" disabled>Save karo</button></div>
+      ${me.mark ? `<button type="button" class="linkish" id="mx" style="align-self:center">Nishaan hatao, initial dikhao</button>` : ""}`);
+    sheet.querySelector("[data-close]").onclick = closeSheet;
+    const save = async mark => {
+      const { error } = await S.sb.from("members").update({ mark }).eq("id", me.id);
+      if (error) { $("#mErr").textContent = "Save nahi hua. Dobara try karo."; return; }
+      me.mark = mark; closeSheet(); render();
+    };
+    const mx = $("#mx"); if (mx) mx.onclick = () => save(null);
+    drawPad($("#mpad"), 100, 100, { size: 7, color: () => "#FFFFFF", onChange: n => { $("#ms").disabled = !n; } })
+      .then(pad => {
+        $("#mu").onclick = () => pad.undo(); $("#mc").onclick = () => pad.clear();
+        $("#ms").onclick = () => save({ d: pad.strokes.map(s => s.d) });
+      })
+      .catch(() => { $("#mErr").textContent = "Drawing tool load nahi hua. Net check karo."; });
+  }
+
+  function renameFamSheet(){
+    openSheet(`<h2>Parivaar ka naam</h2>
+      <form id="rf" style="display:flex;flex-direction:column;gap:12px">
+        <input class="field" id="rn" maxlength="40" value="${esc(S.fam.name)}" aria-label="Parivaar ka naam">
+        <p class="err" id="fErr"></p>
+        <div class="row"><button type="button" class="btn" data-close>Rehne do</button><button type="submit" class="btn pri">Save karo</button></div>
+      </form>`);
+    sheet.querySelector("[data-close]").onclick = closeSheet;
+    $("#rf").onsubmit = async e => {
+      e.preventDefault();
+      const name = $("#rn").value.trim(); if (!name) return;
+      const { error } = await S.sb.from("families").update({ name }).eq("id", S.fam.id);
+      if (error) { $("#fErr").textContent = "Save nahi hua."; return; }
+      S.fam.name = name; $("#famName").textContent = name; closeSheet(); render();
+    };
+  }
+
+  function confirmSheet(title, text, yes, onYes){
+    openSheet(`<h2>${title}</h2><p>${text}</p><div class="row"><button type="button" class="btn" data-close>Rehne do</button><button type="button" class="btn warn" id="yes">${yes}</button></div>`);
+    sheet.querySelector("[data-close]").onclick = closeSheet;
+    $("#yes").onclick = () => { closeSheet(); onYes(); };
+  }
+
+  function compress(file){
+    return new Promise((res, rej) => {
+      const url = URL.createObjectURL(file), im = new Image();
+      im.onload = () => {
+        const max = 1280, s = Math.min(1, max / Math.max(im.naturalWidth, im.naturalHeight));
+        const c = document.createElement("canvas");
+        c.width = Math.round(im.naturalWidth*s); c.height = Math.round(im.naturalHeight*s);
+        c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        c.toBlob(b => b ? res(b) : rej(new Error("blob")), "image/jpeg", 0.82);
+      };
+      im.onerror = () => { URL.revokeObjectURL(url); rej(new Error("decode")); };
+      im.src = url;
+    });
+  }
+
+  function addPhotoSheet(){
+    openSheet(`<h2>Naya pal</h2>
+      <label class="pick" for="file" id="pick">Photo chuno ya camera se kheencho</label>
+      <input type="file" id="file" accept="image/*" hidden>
+      <fieldset class="tags"><legend>Kiski photo hai?</legend>
+        <label class="t-kaam"><input type="radio" name="tag" value="kaam"><span>Kaam</span></label>
+        <label class="t-khana"><input type="radio" name="tag" value="khana" checked><span>Khana</span></label>
+        <label class="t-pal"><input type="radio" name="tag" value="pal"><span>Pal</span></label>
+      </fieldset>
+      <input class="field" id="cap" maxlength="120" placeholder="Kuch likhna hai? (optional)" aria-label="Caption">
+      <p class="err" id="aErr"></p>
+      <div class="row"><button type="button" class="btn" data-close>Rehne do</button><button type="button" class="btn pri" id="post" disabled>Daal do</button></div>`);
+    let file = null;
+    sheet.querySelector("[data-close]").onclick = closeSheet;
+    $("#file").addEventListener("change", e => {
+      file = e.target.files[0] || null;
+      if (!file) return;
+      $("#pick").innerHTML = `<img src="${URL.createObjectURL(file)}" alt="Chuni hui photo">`;
+      $("#post").disabled = false; $("#aErr").textContent = "";
+    });
+    $("#post").addEventListener("click", async () => {
+      if (!file) return;
+      const btn = $("#post"); btn.disabled = true; btn.textContent = "Daal rahe hain…";
+      const tag = sheet.querySelector("input[name=tag]:checked")?.value || "pal";
+      const caption = $("#cap").value.trim().slice(0,120) || null;
+      try {
+        let blob, type = "image/jpeg";
+        try { blob = await compress(file); } catch { blob = file; type = file.type || "image/jpeg"; }
+        const day = todayKey();
+        const path = `${S.fam.id}/${day}/${uid()}.jpg`;
+        const up = await S.sb.storage.from("photos").upload(path, blob, { contentType:type, upsert:false });
+        if (up.error) throw up.error;
+        const ins = await S.sb.from("posts").insert({ family_id:S.fam.id, member:S.me, tag, caption, day, path });
+        if (ins.error) throw ins.error;
+        closeSheet();
+        S.day = todayKey(); S.filter = "all"; loadDay();
+      } catch (err) {
+        const big = /size|large|413/i.test(String(err?.message || err?.statusCode || ""));
+        $("#aErr").textContent = big ? "Photo bahut badi hai. Koi chhoti photo chuno." : "Photo nahi daal paaye. Net check karke dobara try karo.";
+        btn.disabled = false; btn.textContent = "Daal do";
+      }
+    });
+  }
+
+  function dilSheet(withPrompt){
+    const me = meM();
+    const prompt = withPrompt ? sawaalFor(todayKey()) : null;
+    let mood = "yunhi";
+    openSheet(`<h2>Dil Ki Baat</h2>
+      ${prompt ? `<p class="small">Aaj ka sawaal: <b>${esc(prompt)}</b></p>` : ""}
+      <fieldset class="tags moods-pick"><legend>Kis tarah ki baat hai?</legend>
+        ${Object.entries(MOODS).map(([k,[l,c]]) => `<label class="c-${c}"><input type="radio" name="mood" value="${k}" ${k===mood?"checked":""}><span>${k==="custom"?"Kuch aur…":l}</span></label>`).join("")}
+      </fieldset>
+      <input class="field" id="moodLabel" maxlength="16" placeholder="Apna naam do, jaise Recipe ya Gossip" aria-label="Apni category ka naam" hidden>
+      <div class="starters" id="starters"></div>
+      <div class="compose c-y" id="compose"><textarea class="field" id="body" maxlength="400" placeholder="Jo kehna hai, likh do…" aria-label="Dil ki baat"></textarea></div>
+      <p class="count" id="count">0 / 400</p>
+      <label class="toggle"><input type="checkbox" id="gupt"><span><b>Gupt rakho.</b> Naam kahin save nahi hoga, kisi ko pata nahi chalega kisne likha.</span></label>
+      <p class="small" id="asWho"></p>
+      <p class="err" id="dErr"></p>
+      <div class="row"><button type="button" class="btn" data-close>Rehne do</button><button type="button" class="btn pri" id="send" disabled>Chipka do</button></div>`);
+    const body = $("#body"), send = $("#send");
+    const drawStarters = () => { $("#starters").innerHTML = (STARTERS[mood] || []).map(s => `<button type="button" data-s="${esc(s)}">${esc(s.trim())}</button>`).join(""); };
+    const check = () => { send.disabled = !body.value.trim(); $("#count").textContent = `${body.value.length} / 400`; };
+    const drawWho = () => {
+      $("#asWho").innerHTML = $("#gupt").checked ? "Yeh <b>Gupt</b> naam se dikhega. Sirf isi phone se aap ise hata paoge." : `Aapke naam se dikhega: <b>${esc(me.name)}</b>`;
+    };
+    drawStarters(); drawWho(); check();
+    sheet.querySelectorAll("input[name=mood]").forEach(r => r.addEventListener("change", () => {
+      mood = r.value; $("#compose").className = "compose c-" + MOODS[mood][1]; drawStarters();
+      $("#moodLabel").hidden = mood !== "custom"; if (mood === "custom") $("#moodLabel").focus();
+    }));
+    $("#starters").addEventListener("click", e => {
+      const b = e.target.closest("[data-s]"); if (!b) return;
+      body.value = b.dataset.s + body.value; body.focus(); body.setSelectionRange(body.value.length, body.value.length); check();
+    });
+    body.addEventListener("input", check);
+    $("#gupt").addEventListener("change", drawWho);
+    sheet.querySelector("[data-close]").onclick = closeSheet;
+    send.addEventListener("click", async () => {
+      const text = body.value.trim().slice(0, 400); if (!text) return;
+      const gupt = $("#gupt").checked;
+      send.disabled = true; send.textContent = "Chipka rahe hain…";
+      const id = uid();
+      const mood_label = mood === "custom" ? ($("#moodLabel").value.trim().slice(0,16) || null) : null;
+      const { error } = await S.sb.from("confessions").insert({ id, family_id:S.fam.id, member: gupt ? null : S.me, mood, mood_label, body:text, prompt, day: todayKey() });
+      if (error) { $("#dErr").textContent = "Nahi chipka paaye. Net check karke dobara try karo."; send.disabled = false; send.textContent = "Chipka do"; return; }
+      mine.add(id);
+      closeSheet();
+      S.day = todayKey(); S.filter = "all"; loadDay();
+    });
+  }
+
+  function viewSheet(id){
+    S.sheetPost = id; S.hideDoodles = false;
+    openSheet(`<div id="vs"></div>`);
+    refreshView(true);
+  }
+  function refreshView(first){
+    const p = S.posts.find(x => x.id === S.sheetPost); if (!p) { closeSheet(); return; }
+    const box = $("#vs"); if (!box) return;
+    const keep = first ? "" : ($("#ci")?.value || "");
+    const h = new Date(p.ts).getHours();
+    const rx = S.preacts.filter(r => r.post_id === p.id);
+    const cms = S.comments.filter(c => c.post_id === p.id);
+    const dds = S.doodles.filter(d => d.post_id === p.id);
+    const myDd = dds.filter(d => d.member === S.me);
+    box.innerHTML = `<div class="big">${photoHTML(p, (TAGS[p.tag]||"Pal")+", "+mName(p.member))}</div>
+      <div class="meta" style="padding:0">${whoHTML(p.member)}<span class="tag t-${esc(p.tag||"pal")}">${esc(TAGS[p.tag]||"Pal")}</span><time>${tstr(p.ts)} ${ap(h)}, ${tod(h)}</time></div>
+      ${p.caption?`<p>${esc(p.caption)}</p>`:""}
+      <div class="stamps">${PHOTO_STAMPS.map(([k, l]) => { const n = rx.filter(r => r.kind === k).length; const on = rx.some(r => r.kind === k && r.member === S.me);
+        return `<button type="button" class="stamp" data-vact="stamp" data-k="${k}" data-id="${esc(p.id)}" aria-pressed="${on}"><span>${l}${n?`<b>${n}</b>`:""}</span></button>`; }).join("")}</div>
+      ${rx.length ? `<p class="small">${[...new Set(rx.map(r => r.member))].map(m => esc(mLabel(m))).join(", ")} ne stamp lagaya</p>` : ""}
+      <div class="ddlist"><button type="button" class="btn" data-vact="doodle" style="flex:none;padding:8px 14px">Photo pe kuch banao</button>
+        ${dds.length ? `<span>${dds.length} doodle: ${[...new Set(dds.map(d => d.member))].map(m => esc(mLabel(m))).join(", ")}</span>
+        <button type="button" class="linkish" data-vact="hidedd">${S.hideDoodles ? "Doodle dikhao" : "Doodle chhupao"}</button>` : ""}
+        ${myDd.length ? `<button type="button" class="linkish" data-vact="deldd" style="color:var(--error)">Mera doodle hatao</button>` : ""}</div>
+      <div class="cmts">${cms.map(c => `<div class="cmt">${dotHTML(c.member)}<div><b>${esc(mName(c.member))}</b>${mRel(c.member)?` <span class="rel">· ${esc(mRel(c.member))}</span>`:""}<time>${tstr(c.ts)}</time><p>${esc(c.body)}</p>
+          ${c.member === S.me ? `<button type="button" class="x" data-vact="delc" data-id="${esc(c.id)}">hatao</button>` : ""}</div></div>`).join("")}</div>
+      <form class="row" id="cf"><input class="field" id="ci" maxlength="300" placeholder="Kuch kaho…" aria-label="Comment likho" autocomplete="off"><button type="submit" class="btn pri" style="flex:none">Bhejo</button></form>
+      <p class="err" id="vErr"></p>
+      <div class="row">${p.member === S.me ? `<button type="button" class="btn warn" data-vact="delpost">Photo hatao</button>` : ""}<button type="button" class="btn" data-vact="close">Band karo</button></div>`;
+    $("#ci").value = keep;
+    decorateStamps(box);
+    $("#cf").onsubmit = async e => {
+      e.preventDefault();
+      const body = $("#ci").value.trim().slice(0, 300); if (!body) return;
+      const row = { id:uid(), family_id:S.fam.id, post_id:p.id, member:S.me, body, ts:new Date().toISOString() };
+      $("#ci").value = "";
+      S.comments.push(row); refreshView(); render();
+      const { error } = await S.sb.from("comments").insert({ id:row.id, family_id:row.family_id, post_id:row.post_id, member:row.member, body });
+      if (error) { S.comments = S.comments.filter(c => c !== row); refreshView(); render(); $("#vErr").textContent = "Comment nahi gaya. Dobara try karo."; }
+    };
+  }
+  async function viewAction(t){
+    const a = t.dataset.vact, p = S.posts.find(x => x.id === S.sheetPost); if (!p) return;
+    if (a === "close") { S.sheetPost = null; closeSheet(); }
+    else if (a === "stamp") {
+      const k = t.dataset.k, has = S.preacts.find(r => r.post_id === p.id && r.kind === k && r.member === S.me);
+      S.preacts = has ? S.preacts.filter(r => r !== has) : [...S.preacts, { post_id:p.id, member:S.me, kind:k }];
+      refreshView(); render();
+      const { error } = has
+        ? await S.sb.from("photo_reactions").delete().eq("post_id", p.id).eq("member", S.me).eq("kind", k)
+        : await S.sb.from("photo_reactions").insert({ family_id:S.fam.id, post_id:p.id, member:S.me, kind:k });
+      if (error && !/duplicate|23505/i.test(String(error.message || error.code))) loadDay(true);
+    }
+    else if (a === "hidedd") { S.hideDoodles = !S.hideDoodles; refreshView(); }
+    else if (a === "deldd") {
+      const mineIds = S.doodles.filter(d => d.post_id === p.id && d.member === S.me).map(d => d.id);
+      S.doodles = S.doodles.filter(d => !mineIds.includes(d.id)); refreshView(); render();
+      await S.sb.from("doodles").delete().in("id", mineIds);
+    }
+    else if (a === "delc") {
+      const id = t.dataset.id; S.comments = S.comments.filter(c => c.id !== id); refreshView(); render();
+      await S.sb.from("comments").delete().eq("id", id);
+    }
+    else if (a === "delpost") {
+      if (t.dataset.armed !== "1") { t.dataset.armed = "1"; t.textContent = "Pakka hatana hai?"; return; }
+      const { error } = await S.sb.from("posts").delete().eq("id", p.id);
+      if (error) { $("#vErr").textContent = "Hata nahi paaye. Dobara try karo."; return; }
+      S.sheetPost = null; closeSheet(); loadDay(true);
+    }
+    else if (a === "doodle") doodleMode(p);
+  }
+  const PENS = ["#FFFFFF","#F99D1B","#DA525D","#064F6E","#1F1C12"];
+  async function doodleMode(p){
+    const box = $("#vs"); if (!box) return;
+    box.innerHTML = `<h2>Photo pe kuch banao</h2>
+      <p class="small">Ungli se banao: dil, moonchh, tareef. Sabko dikhega.</p>
+      <div class="big"><span class="pw draw">${img(p, "Photo")}<svg id="pad" class="dd" aria-label="Doodle banane ki jagah"></svg></span></div>
+      <div class="pens" id="pens">${PENS.map((c, i) => `<button type="button" data-c="${c}" style="background:${c}" aria-label="Rang ${i+1}" aria-pressed="${i===0}"></button>`).join("")}
+        <button type="button" class="linkish" id="du" style="margin-left:auto">Undo</button></div>
+      <p class="err" id="dErr"></p>
+      <div class="row"><button type="button" class="btn" id="dx">Rehne do</button><button type="button" class="btn pri" id="ds" disabled>Chipka do</button></div>`;
+    $("#dx").onclick = () => refreshView();
+    const im = box.querySelector(".pw img");
+    try { if (!im.complete) await new Promise((r, j) => { im.onload = r; im.onerror = j; }); }
+    catch { $("#dErr").textContent = "Photo load nahi hui."; return; }
+    const W = 1000, H = Math.max(1, Math.round(1000 * (im.naturalHeight || 750) / (im.naturalWidth || 1000)));
+    const svg = $("#pad"); svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("preserveAspectRatio", "xMidYMid slice");
+    let color = PENS[0];
+    $("#pens").onclick = e => { const b = e.target.closest("[data-c]"); if (!b) return; color = b.dataset.c; $("#pens").querySelectorAll("[data-c]").forEach(x => x.setAttribute("aria-pressed", x === b)); };
+    let pad;
+    try { pad = await drawPad(svg, W, H, { size: 16, color: () => color, onChange: n => { $("#ds").disabled = !n; } }); }
+    catch { $("#dErr").textContent = "Drawing tool load nahi hua. Net check karo."; return; }
+    $("#du").onclick = () => pad.undo();
+    $("#ds").onclick = async () => {
+      const strokes = pad.strokes.map(s => ({ d: s.d, c: s.c }));
+      const row = { id:uid(), family_id:S.fam.id, post_id:p.id, member:S.me, vb:`${W} ${H}`, strokes };
+      if (JSON.stringify(strokes).length > 55000) { $("#dErr").textContent = "Doodle bahut bada ho gaya. Thoda kam banao."; return; }
+      $("#ds").disabled = true;
+      const { error } = await S.sb.from("doodles").insert(row);
+      if (error) { $("#dErr").textContent = "Save nahi hua. Dobara try karo."; $("#ds").disabled = false; return; }
+      S.doodles.push(Object.assign({ ts:new Date().toISOString() }, row)); S.hideDoodles = false; refreshView(); render();
+    };
+  }
+
+  async function setReminder(h){
+    const me = meM();
+    const note = t => { S.remindNote = t; const n = $("#rnote"); if (n) n.textContent = t; };
+    if (h === null) {
+      await S.sb.from("members").update({ remind_at:null }).eq("id", me.id);
+      me.remind_at = null; note("Reminder band. Jab chaho phir chalu kar lena."); render(); return;
+    }
+    const ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    const standalone = navigator.standalone || matchMedia("(display-mode: standalone)").matches;
+    if (!cfg.vapidPublicKey) return note("Reminders abhi set up nahi hue. Shiv se kaho README ka reminder wala step kar de.");
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return note(ios && !standalone ? "iPhone pe pehle Share > Add to Home Screen karo, phir wahan se app kholke yeh chuno." : "Is browser mein reminder nahi chal sakte. Chrome mein kholke try karo.");
+    try {
+      const perm = await Notification.requestPermission();
+      if (perm !== "granted") return note("Notification ki permission nahi mili. Phone ki settings mein is site ko allow karo.");
+      const reg = await Promise.race([navigator.serviceWorker.ready, new Promise((_, j) => setTimeout(() => j(new Error("sw")), 8000))]);
+      const key = Uint8Array.from(atob(cfg.vapidPublicKey.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((cfg.vapidPublicKey.length + 3) % 4)), c => c.charCodeAt(0));
+      const sub = (await reg.pushManager.getSubscription()) || (await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:key }));
+      const j = sub.toJSON();
+      const a = await S.sb.from("push_subs").upsert({ endpoint:j.endpoint, family_id:S.fam.id, member:me.id, p256dh:j.keys.p256dh, auth:j.keys.auth }, { onConflict:"endpoint" });
+      const b = await S.sb.from("members").update({ remind_at:h }).eq("id", me.id);
+      if (a.error || b.error) return note("Save nahi hua. Dobara try karo.");
+      me.remind_at = h; note(`Ho gaya! Roz ${REMIND.find(r => r[1] === h)[0].toLowerCase()} baje yaad dilayenge, agar tab tak kuch nahi daala.`); render();
+    } catch { note("Reminder chalu nahi ho paaya. Thodi der baad dobara try karo."); }
+  }
+
+  async function toggleReact(cid, kind){
+    const has = S.reacts.find(r => r.confession_id === cid && r.kind === kind && r.member === S.me);
+    const before = S.reacts;
+    S.reacts = has ? S.reacts.filter(r => r !== has) : [...S.reacts, { confession_id:cid, member:S.me, kind }];
+    render();
+    const { error } = has
+      ? await S.sb.from("reactions").delete().eq("confession_id", cid).eq("member", S.me).eq("kind", kind)
+      : await S.sb.from("reactions").insert({ family_id:S.fam.id, confession_id:cid, member:S.me, kind });
+    if (error && !/duplicate|23505/i.test(String(error.message || error.code))) { S.reacts = before; render(); }
+  }
+
+  let armedChit = null;
+  async function deleteChit(btn){
+    const id = btn.dataset.id;
+    if (armedChit !== id) { armedChit = id; btn.textContent = "Pakka hatana hai?"; btn.classList.add("armed"); return; }
+    armedChit = null; btn.disabled = true;
+    const { error } = await S.sb.from("confessions").delete().eq("id", id);
+    if (error) { btn.disabled = false; btn.textContent = "Hata nahi paaye"; return; }
+    S.conf = S.conf.filter(c => c.id !== id); render();
+  }
+
+  async function copyLink(btn){
+    const link = inviteLink();
+    try { await navigator.clipboard.writeText(link); btn.textContent = "Copy ho gaya"; }
+    catch { openSheet(`<h2>Yeh link bhejo</h2><input class="field" value="${esc(link)}" readonly aria-label="Invite link"><button type="button" class="btn" data-close>Band karo</button>`); sheet.querySelector("[data-close]").onclick = closeSheet; sheet.querySelector("input").select(); }
+  }
+
+  /* ================= events ================= */
+  document.addEventListener("click", e => {
+    const t = e.target.closest("[data-act]"); if (!t || sheet.contains(t) || !S.sb || $("#app").hidden) return;
+    const a = t.dataset.act;
+    if (a !== "delchit" && armedChit) armedChit = null;
+    if (a === "prev") { S.day = shiftDay(S.day, -1); loadDay(); }
+    else if (a === "next") { if (S.day !== todayKey()) { S.day = shiftDay(S.day, 1); loadDay(); } }
+    else if (a === "mode") { S.mode = t.dataset.m; S.filter = "all"; ls.set("fkd-mode", S.mode); render(); window.scrollTo(0, 0); }
+    else if (a === "filter") { S.filter = (S.filter === t.dataset.k && t.dataset.k !== "all") ? "all" : t.dataset.k; render(); }
+    else if (a === "view") { S.view = t.dataset.v; render(); }
+    else if (a === "add") S.mode === "parivaar" ? addMemberSheet() : S.mode === "dil" ? dilSheet(false) : addPhotoSheet();
+    else if (a === "sawaal") dilSheet(true);
+    else if (a === "open") viewSheet(t.dataset.id);
+    else if (a === "react") toggleReact(t.dataset.id, t.dataset.k);
+    else if (a === "delchit") deleteChit(t);
+    else if (a === "relpick") relSheet(t.dataset.id);
+    else if (a === "acceptrel") setRelation(t.dataset.id, t.dataset.l).then(render);
+    else if (a === "editme") editMeSheet();
+    else if (a === "drawmark") markSheet();
+    else if (a === "install") doInstall();
+    else if (a === "installx") { ls.set("fkd-install-x", "1"); render(); }
+    else if (a === "remind") setReminder(t.dataset.h === "" ? null : Number(t.dataset.h));
+    else if (a === "leaveself") confirmSheet("Parivaar chhodna hai?", "Aapka naam, photos, comments aur doodles hat jayenge, aur aapki dil ki baatein Gupt ban jayengi. Yeh wapas nahi hoga.", "Haan, chhodo", async () => {
+      const { error } = await S.sb.from("members").delete().eq("id", S.me);
+      if (error) return;
+      ls.del("fkd-me"); ls.del("fkd-code"); location.href = location.pathname;
+    });
+    else if (a === "renamefam") renameFamSheet();
+    else if (a === "copylink") copyLink(t);
+    else if (a === "switchuser") confirmSheet("User badlo?", "Is phone se aap log out ho jaoge. Aapki photos aur baatein waise hi rahengi.", "Haan, badlo", () => { ls.del("fkd-me"); S.me = null; S.rel = {}; S.relIn = []; onbWho(false); });
+    else if (a === "leavefam") confirmSheet("Doosre parivaar mein jao?", `Is phone se ${esc(S.fam.name)} hat jayega. Wapas aane ke liye code chahiye hoga: <b>${esc(S.fam.code)}</b>`, "Haan, jao", () => { ls.del("fkd-me"); ls.del("fkd-code"); location.href = location.pathname; });
+  });
+
+  if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
+  boot();
+})();
+</script>
+</body>
+</html>
