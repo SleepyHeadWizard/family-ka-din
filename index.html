@@ -46,7 +46,9 @@
     --bg:#1A1810;--surface:#25221A;--sunk:#2F2B20;--ink:#F5ECC2;--muted:#B5AC8E;--line:#3A3527;
     --primary:#8CC4E0;--on-primary:#1A1810;--accent:#F99D1B;--on-accent:#141414;
     --kaam:#8CC4E0;--khana:#F9A43A;--pal:#D9C45A;--error:#F2836F;
-    --chit-b:#1E3340;--chit-y:#37311C;--chit-p:#3D2C16;--gupt:#5A5240;--tape:rgba(245,236,194,.22);
+    /* Notes stay paper in dark mode: combination 151 hues, lightness lowered a little to avoid glare.
+       (Darkened yellow/orange turns brown, which looked muddy.) Text on them uses the paper-ink tokens below. */
+    --chit-b:#BCD3DC;--chit-y:#E6DCB0;--chit-p:#EDCDA6;--gupt:#5A5240;--tape:rgba(255,250,230,.5);
     --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 22px rgba(0,0,0,.35);
     color-scheme:dark;
   }
@@ -124,6 +126,9 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;
 .sawaal span{display:block;font-size:14px;margin-top:6px;opacity:.85}
 .chit{position:relative;border-radius:4px 4px 12px 12px;padding:16px 14px 12px;box-shadow:var(--shadow);transform:rotate(var(--tilt,0deg));background:var(--chit-y)}
 .chit::before{content:"";position:absolute;left:50%;top:-9px;width:64px;height:18px;transform:translateX(-50%) rotate(-2deg);background:var(--tape);border:1px solid var(--line);border-radius:2px}
+/* Paper ink: everything drawn on a note (or a note-coloured chip/box) uses dark ink in both themes.
+   Checked contrast on all six note colours: ink >=10.9, muted >=4.9, deep blue >=5.7, error >=4.7, pill border >=3.1. */
+.chit,.compose,.moods-pick input:checked+span{--ink:#1F1C12;--muted:#5A5340;--line:#7A7157;--primary:#064F6E;--error:#A3271B;color:var(--ink)}
 .chit.c-b{background:var(--chit-b)}
 .chit.c-p{background:var(--chit-p)}
 .chit-top{display:flex;align-items:center;gap:8px;font-size:15px;flex-wrap:wrap}
