@@ -807,6 +807,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     if (mode) { S.mode = mode; ls.set("fkd-mode", mode); }
     onb.hidden = true; $("#app").hidden = false;
     $("#famName").textContent = S.fam.name;
+    try { if (hstate()) history.replaceState(null, ""); if (S.mode !== "photos") history.pushState({ fkd:"tab" }, ""); } catch {}
     loadDay();
     if (!S.started) {
       S.started = true;
@@ -1084,12 +1085,36 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   /* ================= sheets ================= */
   const scrim = $("#scrim"), sheet = $("#sheet");
   let lastFocus = null;
+  /* Phone back button: every open sheet and every tab away from Photos gets a history entry,
+     so back closes the sheet (or leaves drawing), then returns to Photos, and only then exits. */
+  let ignorePop = 0;
+  const hstate = () => (history.state && history.state.fkd) || null;
   function openSheet(html){
-    lastFocus = document.activeElement;
+    if (scrim.hidden) { lastFocus = document.activeElement; try { history.pushState({ fkd:"sheet" }, ""); } catch {} }
     sheet.innerHTML = html; scrim.hidden = false;
     const f = sheet.querySelector("textarea, input:not([type=radio]):not([type=checkbox]), button"); if (f) f.focus();
   }
-  function closeSheet(){ S.sheetPost = null; scrim.hidden = true; sheet.innerHTML = ""; if (lastFocus && document.contains(lastFocus)) lastFocus.focus(); }
+  function closeSheet(fromPop){
+    const wasOpen = !scrim.hidden;
+    S.sheetPost = null; scrim.hidden = true; sheet.innerHTML = "";
+    if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+    if (fromPop !== true && wasOpen && hstate() === "sheet") { ignorePop++; history.back(); }
+  }
+  window.addEventListener("popstate", () => {
+    if (ignorePop) { ignorePop--; if (!scrim.hidden && hstate() !== "sheet") { try { history.pushState({ fkd:"sheet" }, ""); } catch {} } return; }
+    if (!scrim.hidden) {
+      if ($("#pad") && S.sheetPost) { try { history.pushState({ fkd:"sheet" }, ""); } catch {} refreshView(); return; } // leave drawing, keep the photo open
+      closeSheet(true); return;
+    }
+    if (!$("#app").hidden && S.mode !== "photos") goMode("photos", true);
+  });
+  function goMode(m, fromPop){
+    const wasPhotos = S.mode === "photos";
+    S.mode = m; S.filter = "all"; ls.set("fkd-mode", S.mode); render(); window.scrollTo(0, 0);
+    if (fromPop === true) return;
+    if (wasPhotos && m !== "photos") { try { history.pushState({ fkd:"tab" }, ""); } catch {} }
+    else if (!wasPhotos && m === "photos" && hstate() === "tab") { ignorePop++; history.back(); }
+  }
   scrim.addEventListener("click", e => { if (e.target === scrim) { S.sheetPost = null; closeSheet(); return; } const t = e.target.closest("[data-vact]"); if (t) viewAction(t); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !scrim.hidden) closeSheet(); });
 
@@ -1531,7 +1556,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     if (a !== "delchit" && armedChit) armedChit = null;
     if (a === "prev") { S.day = shiftDay(S.day, -1); loadDay(); }
     else if (a === "next") { if (S.day !== todayKey()) { S.day = shiftDay(S.day, 1); loadDay(); } }
-    else if (a === "mode") { S.mode = t.dataset.m; S.filter = "all"; ls.set("fkd-mode", S.mode); render(); window.scrollTo(0, 0); }
+    else if (a === "mode") goMode(t.dataset.m);
     else if (a === "filter") { S.filter = (S.filter === t.dataset.k && t.dataset.k !== "all") ? "all" : t.dataset.k; render(); }
     else if (a === "view") { S.view = t.dataset.v; render(); }
     else if (a === "add") S.mode === "parivaar" ? addMemberSheet() : S.mode === "dil" ? dilSheet(false) : addPhotoSheet();
