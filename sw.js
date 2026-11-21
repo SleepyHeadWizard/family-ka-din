@@ -1,5 +1,5 @@
 // Family Ka Din service worker: works offline-safe and shows reminder notifications.
-const SHELL = "fkd-shell-v1";
+const SHELL = "fkd-shell-v2";
 const FILES = ["./", "./index.html", "./config.js", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon.svg"];
 
 self.addEventListener("install", (e) => {
@@ -27,22 +27,33 @@ self.addEventListener("fetch", (e) => {
   e.respondWith(fetch(req).catch(() => caches.match(req, { ignoreSearch: true })));
 });
 
+// Each kind of activity gets its own tag (so a new photo doesn't replace a comment alert)
+// and its own vibration rhythm. Web pages can't pick the notification sound itself:
+// the phone plays its normal notification sound.
+const VIBE = { photo:[60,40,60], dil:[90,110,90], stamp:[80], react:[30], comment:[40,60,40], doodle:[20,30,20,30,20], join:[100,60,100], nudge:[50] };
 self.addEventListener("push", (e) => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch { d = { body: e.data ? e.data.text() : "" }; }
+  const kind = VIBE[d.kind] ? d.kind : "nudge";
   e.waitUntil(self.registration.showNotification(d.title || "Family Ka Din", {
     body: d.body || "Aaj ka pal daala?",
     icon: "icon-192.png",
     badge: "icon-192.png",
-    tag: "family-nudge",
-    data: { url: d.url || "./" }
+    tag: kind === "nudge" ? "family-nudge" : "fkd-" + kind,
+    renotify: kind !== "nudge",
+    vibrate: VIBE[kind],
+    data: { url: d.url || "./", go: d.go || null }
   }));
 });
 
 self.addEventListener("notificationclick", (e) => {
   e.notification.close();
+  const data = e.notification.data || {};
   e.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((wins) => {
-    for (const w of wins) if ("focus" in w) return w.focus();
-    return self.clients.openWindow(e.notification.data.url || "./");
+    for (const w of wins) if ("focus" in w) {
+      if (data.go) w.postMessage({ fkd: "go", go: data.go });
+      return w.focus();
+    }
+    return self.clients.openWindow(data.url || "./");
   }));
 });

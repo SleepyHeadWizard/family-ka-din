@@ -334,9 +334,19 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 /* celebration */
 .cele{margin:10px 0 2px;text-align:center;font-family:var(--hand);font-weight:700;font-size:22px;color:var(--ink)}
 .cele span{padding:0 6px}
+/* activity toast: one line about what someone else just did; tap to go there */
+.toast{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top));transform:translateX(-50%);z-index:60;
+  width:min(480px,calc(100% - 32px));display:flex;align-items:center;gap:12px;padding:12px 14px;border:0;border-radius:16px;
+  background:var(--primary);color:var(--on-primary);box-shadow:var(--shadow);text-align:left;font-size:16px;line-height:1.3}
+.toast[hidden]{display:none}
+.toast .ic{font-size:22px;flex:none}
+.toast .tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.toast .go{flex:none;font-weight:700;font-size:14px;opacity:.85}
 
 @media (prefers-reduced-motion: no-preference){
   .sheet{animation:up .22s ease-out}
+  .toast{animation:tin .25s ease-out}
+  @keyframes tin{from{transform:translate(-50%,-16px);opacity:0}to{transform:translateX(-50%);opacity:1}}
   @keyframes up{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}
 }
 @media (prefers-reduced-motion: reduce){ .chit{transform:none} }
@@ -380,6 +390,8 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 </nav>
 </div>
 
+<button type="button" class="toast" id="toast" hidden></button>
+<div class="live" id="live" role="status" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"></div>
 <div class="scrim" id="scrim" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
 
 <script src="config.js"></script>
@@ -556,13 +568,165 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     if (!window.confetti) return;
     const petal = confetti.shapeFromPath({ path: "M5 0 C9 3 9 8 5 12 C1 8 1 3 5 0 Z" });
     const shot = (x) => confetti({ particleCount: 60, spread: 70, startVelocity: 32, angle: x < .5 ? 60 : 120, origin: { x, y: .35 }, shapes: [petal], scalar: 1.8, gravity: .6, drift: x < .5 ? .4 : -.4, ticks: 320, colors: ["#F99D1B","#FCB315","#F3A257","#F5ECC2"], disableForReducedMotion: true });
-    shot(.1); setTimeout(() => shot(.9), 250);
+    shot(.1); setTimeout(() => shot(.9), 250); SFX.play("cele");
   }
   const annotated = new Set();
   function annotate(el, key, opts){
     if (!el || !window.RoughNotation) return;
     const a = RoughNotation.annotate(el, Object.assign({ animate: !annotated.has(key) }, opts));
     annotated.add(key); a.show();
+  }
+
+  /* ================= sounds & alerts =================
+     Every kind of action has its own short sound, made live with Web Audio
+     (no sound files, so it works offline and adds nothing to download).
+     Setting fkd-alerts: "all" = sound + alert, "quiet" = alert only, "off" = nothing. */
+  const alertsMode = () => ["all","quiet","off"].includes(ls.get("fkd-alerts")) ? ls.get("fkd-alerts") : "all";
+  const SFX = (() => {
+    let ctx = null, out = null;
+    const ac = () => {
+      if (!ctx) {
+        const C = window.AudioContext || window.webkitAudioContext; if (!C) return null;
+        try { ctx = new C(); out = ctx.createGain(); out.gain.value = .8; out.connect(ctx.destination); } catch { ctx = null; return null; }
+      }
+      if (ctx.state === "suspended") ctx.resume().catch(() => {});
+      return ctx;
+    };
+    // Browsers only allow sound after the person has touched the page once.
+    const unlock = () => { if (alertsMode() === "all" && (!ctx || ctx.state !== "running")) ac(); };
+    ["pointerdown","keydown"].forEach(ev => addEventListener(ev, unlock, { capture:true, passive:true }));
+
+    function tone(c, t, f, o){
+      o = Object.assign({ type:"sine", dur:.2, vol:.2, att:.006 }, o);
+      const osc = c.createOscillator(), g = c.createGain();
+      osc.type = o.type; osc.frequency.setValueAtTime(f, t);
+      if (o.to) osc.frequency.exponentialRampToValueAtTime(o.to, t + o.dur);
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(o.vol, t + o.att); g.gain.exponentialRampToValueAtTime(.0001, t + o.dur);
+      osc.connect(g); g.connect(out); osc.start(t); osc.stop(t + o.dur + .03);
+    }
+    function noise(c, t, o){
+      o = Object.assign({ dur:.05, vol:.2, filter:"highpass", f:2500, q:1 }, o);
+      const n = Math.max(1, Math.floor(c.sampleRate * o.dur)), buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+      const src = c.createBufferSource(), fl = c.createBiquadFilter(), g = c.createGain();
+      src.buffer = buf; fl.type = o.filter; fl.Q.value = o.q; fl.frequency.setValueAtTime(o.f, t);
+      if (o.to) fl.frequency.exponentialRampToValueAtTime(o.to, t + o.dur);
+      g.gain.setValueAtTime(o.vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + o.dur);
+      src.connect(fl); fl.connect(g); g.connect(out); src.start(t); src.stop(t + o.dur + .03);
+    }
+    // a small bell: the note plus a quiet inharmonic partial
+    const bell = (c, t, f, dur = .6, vol = .16) => { tone(c, t, f, { dur, vol }); tone(c, t, f * 2.76, { dur: dur * .5, vol: vol * .25 }); };
+
+    const KINDS = {
+      // camera shutter (two blade clicks), then a bright two-note chime
+      photo(c, t){ noise(c, t, { dur:.03, vol:.35, f:3200 }); noise(c, t + .07, { dur:.045, vol:.28, f:2200 }); bell(c, t + .16, 1318.5, .5); bell(c, t + .26, 1975.5, .7); },
+      // dhak-dhak heartbeat, then a warm soft note
+      dil(c, t){ tone(c, t, 95, { to:50, dur:.15, vol:.55 }); tone(c, t + .2, 85, { to:45, dur:.17, vol:.42 }); tone(c, t + .48, 659.3, { type:"triangle", dur:.7, vol:.11 }); tone(c, t + .48, 987.8, { dur:.8, vol:.06 }); },
+      // rubber stamp hitting paper: a low thud with a papery tick
+      stamp(c, t){ tone(c, t, 190, { to:55, dur:.13, vol:.6, att:.002 }); noise(c, t, { dur:.07, vol:.3, filter:"lowpass", f:1400 }); },
+      // bubbly pop for a reaction on a note
+      react(c, t){ tone(c, t, 380, { to:980, dur:.09, vol:.28, att:.003 }); tone(c, t + .1, 1567.98, { dur:.12, vol:.07 }); },
+      // "ting-ting", like a message arriving
+      comment(c, t){ tone(c, t, 784, { type:"triangle", dur:.16, vol:.2 }); tone(c, t + .13, 1046.5, { type:"triangle", dur:.3, vol:.2 }); },
+      // pen scribble: two quick swishes of filtered noise
+      doodle(c, t){ noise(c, t, { dur:.17, vol:.28, filter:"bandpass", f:900, to:2600, q:2.5 }); noise(c, t + .19, { dur:.15, vol:.22, filter:"bandpass", f:2400, to:1000, q:2.5 }); },
+      // dhol-like double beat, then a welcoming chime: someone joined
+      join(c, t){ tone(c, t, 130, { to:70, dur:.18, vol:.5 }); tone(c, t + .2, 130, { to:70, dur:.18, vol:.5 }); bell(c, t + .38, 783.99); bell(c, t + .5, 1046.5, .8); },
+      // rising bell arpeggio: the whole family posted today
+      cele(c, t){ [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => bell(c, t + i * .09, f, .9, .13)); },
+      // something removed: a soft falling pair
+      remove(c, t){ tone(c, t, 587.3, { dur:.12, vol:.12 }); tone(c, t + .1, 392, { dur:.22, vol:.12 }); },
+      // small confirmation (reminder set, rishta saved)
+      ting(c, t){ bell(c, t, 1567.98, .45, .14); }
+    };
+    return {
+      play(kind){
+        if (alertsMode() !== "all" || !KINDS[kind]) return;
+        const c = ac(); if (!c || c.state !== "running") return;
+        try { KINDS[kind](c, c.currentTime + .02); } catch {}
+      },
+      kinds: Object.keys(KINDS)
+    };
+  })();
+  const VIBE = { photo:[60,40,60], dil:[90,110,90], stamp:[80], react:[30], comment:[40,60,40], doodle:[20,30,20,30,20], join:[100,60,100] };
+  const ALERT_ICON = { photo:"📷", dil:"💌", comment:"💬", doodle:"✏️", stamp:"🌟", react:"❤️", join:"🎉" };
+  // When several things arrive together, the most important one sets the sound and the message.
+  const ALERT_ORDER = ["photo","dil","join","comment","doodle","stamp","react"];
+
+  const toastEl = () => $("#toast");
+  let toastTimer = null, toastEv = null;
+  function hideToast(){ clearTimeout(toastTimer); const t = toastEl(); if (t) t.hidden = true; toastEv = null; }
+  function showToast(ev, text){
+    const t = toastEl(); if (!t) return;
+    toastEv = ev;
+    t.innerHTML = `<span class="ic" aria-hidden="true">${ALERT_ICON[ev.kind] || "🔔"}</span><span class="tx">${esc(text)}</span><span class="go">Dekho</span>`;
+    t.hidden = false; $("#live").textContent = text;
+    clearTimeout(toastTimer); toastTimer = setTimeout(hideToast, 6000);
+  }
+  async function goToEvent(ev){
+    hideToast(); if (!ev || !S.sb || $("#app").hidden) return;
+    if (ev.mode && S.mode !== ev.mode) goMode(ev.mode);
+    if (S.day !== todayKey()) { S.day = todayKey(); S.filter = "all"; await loadDay(); }
+    if (ev.post && S.posts.some(p => p.id === ev.post)) viewSheet(ev.post);
+  }
+  $("#toast").addEventListener("click", () => goToEvent(toastEv));
+
+  const canSysNotify = () => alertsMode() !== "off" && "Notification" in window && Notification.permission === "granted" && "serviceWorker" in navigator;
+  async function sysNotify(ev, text){
+    try {
+      const reg = await navigator.serviceWorker.getRegistration(); if (!reg) return;
+      await reg.showNotification("Family Ka Din", {
+        body: text, icon:"icon-192.png", badge:"icon-192.png", tag:"fkd-" + ev.kind, renotify:true,
+        silent: alertsMode() === "quiet", vibrate: VIBE[ev.kind] || [50],
+        data:{ url:"./", go:{ kind:ev.kind, mode:ev.mode, post:ev.post || null } }
+      });
+    } catch {}
+  }
+  function announce(evs){
+    if (!evs.length || alertsMode() === "off") return;
+    evs.sort((a, b) => ALERT_ORDER.indexOf(a.kind) - ALERT_ORDER.indexOf(b.kind));
+    const top = evs[0], more = evs.length - 1;
+    const text = top.text + (more ? ` · aur ${more} nayi ${more === 1 ? "baat" : "baatein"}` : "");
+    if (document.hidden) { if (canSysNotify()) sysNotify(top, text); return; }
+    SFX.play(top.kind);
+    try { if (navigator.vibrate && alertsMode() !== "off") navigator.vibrate(VIBE[top.kind] || 40); } catch {}
+    showToast(top, text);
+  }
+  // Notification tapped while the app was in the background: the service worker tells us where to go.
+  if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", e => { if (e.data && e.data.fkd === "go") goToEvent(e.data.go); });
+
+  /* What changed since the last look at today? Only other people's actions are announced;
+     your own actions already play their sound when you do them. */
+  const whose = id => id === S.me ? "aapki" : `${mLabel(id)} ki`;
+  const short = (s, n = 40) => { s = String(s || "").replace(/\s+/g, " ").trim(); return s.length > n ? s.slice(0, n - 1) + "…" : s; };
+  function activityOf(){
+    const evs = [];
+    const postOf = id => S.posts.find(p => p.id === id);
+    const chitOf = id => S.conf.find(c => c.id === id);
+    const myChit = c => c && ((c.member && c.member === S.me) || mine.has(c.id));
+    S.posts.forEach(p => evs.push({ key:"p:" + p.id, kind:"photo", mode:"photos", post:p.id, own:p.member === S.me,
+      text:`${mLabel(p.member)} ne nayi photo daali${p.caption ? `: "${short(p.caption)}"` : ` (${TAGS[p.tag] || "Pal"})`}` }));
+    S.conf.forEach(c => evs.push({ key:"c:" + c.id, kind:"dil", mode:"dil", own:myChit(c),
+      text: c.member ? `${mLabel(c.member)} ne dil ki baat likhi: "${short(c.body)}"` : `Kisi ne gupt dil ki baat likhi: "${short(c.body)}"` }));
+    S.comments.forEach(m => { const p = postOf(m.post_id); evs.push({ key:"m:" + m.id, kind:"comment", mode:"photos", post:m.post_id, own:m.member === S.me,
+      text:`${mLabel(m.member)} ne ${p ? whose(p.member) : "ek"} photo pe likha: "${short(m.body)}"` }); });
+    S.doodles.forEach(d => { const p = postOf(d.post_id); evs.push({ key:"d:" + d.id, kind:"doodle", mode:"photos", post:d.post_id, own:d.member === S.me,
+      text:`${mLabel(d.member)} ne ${p ? whose(p.member) : "ek"} photo pe doodle banaya` }); });
+    // stamps and reactions are announced only when they are on your own photo or note
+    S.preacts.forEach(r => { const p = postOf(r.post_id); const st = PHOTO_STAMPS.find(x => x[0] === r.kind);
+      evs.push({ key:`s:${r.post_id}:${r.member}:${r.kind}`, kind:"stamp", mode:"photos", post:r.post_id, own: r.member === S.me || !p || p.member !== S.me,
+        text:`${mLabel(r.member)} ne aapki photo pe "${st ? st[1] : "stamp"}" lagaya` }); });
+    S.reacts.forEach(r => { const rc = REACTS.find(x => x[0] === r.kind);
+      evs.push({ key:`r:${r.confession_id}:${r.member}:${r.kind}`, kind:"react", mode:"dil", own: r.member === S.me || !myChit(chitOf(r.confession_id)),
+        text:`${mLabel(r.member)}: "${rc ? rc[1] : "❤"}" aapki dil ki baat pe` }); });
+    return evs;
+  }
+  function noticeActivity(){
+    if (S.day !== todayKey()) return;            // only today's activity is news
+    const evs = activityOf();
+    const fresh = S.seen && S.seenDay === S.day ? evs.filter(e => !e.own && !S.seen.has(e.key)) : [];
+    S.seen = new Set(evs.map(e => e.key)); S.seenDay = S.day;
+    announce(fresh);
   }
 
   /* ================= backend ================= */
@@ -580,8 +744,12 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   }
   async function loadMembers(){
     const { data, error } = await S.sb.from("members").select("*").order("created_at");
-    if (!error) S.members = data || [];
-    return !error;
+    if (error) return false;
+    const before = S.started && S.members.length ? new Set(S.members.filter(m => m.claimed).map(m => m.id)) : null;
+    S.members = data || [];
+    if (before) announce(S.members.filter(m => m.claimed && m.id !== S.me && !before.has(m.id))
+      .map(m => ({ kind:"join", mode:"parivaar", text:`${m.name} parivaar mein jud gaye!` })));
+    return true;
   }
   async function loadRelations(){
     if (!S.me) { S.rel = {}; S.relIn = []; return; }
@@ -622,6 +790,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     S.offline = false; S.posts = p.data || []; S.conf = c.data || []; S.reacts = r.data || [];
     S.preacts = pr.data || []; S.comments = cm.data || []; S.doodles = dd.data || [];
     render();
+    noticeActivity();
     if (S.sheetPost && !scrim.hidden && !$("#pad")) refreshView();  // don't wipe a doodle in progress
   }
 
@@ -817,7 +986,10 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     if (!S.started) {
       S.started = true;
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => render());
-      S.poll = setInterval(() => { if (!document.hidden && !$("#app").hidden) loadDay(true); }, 30000);
+      S.poll = setInterval(async () => {
+        if ($("#app").hidden || (document.hidden && !canSysNotify())) return;
+        await loadMembers(); loadDay(true);
+      }, 30000);
       document.addEventListener("visibilitychange", async () => {
         if (document.hidden || $("#app").hidden) return;
         await loadMembers(); await loadRelations(); loadDay(true);
@@ -1059,6 +1231,15 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
         <p>Agar tab tak aapne kuch nahi daala, ek chhota sa message aayega, aapke rishton ke saath: "Mummy ne aaj 2 photo daali…"</p>
         <div class="chips">${REMIND.map(([l, h]) => `<button type="button" data-act="remind" data-h="${h ?? ""}" aria-pressed="${(me.remind_at ?? null) === h}">${l}</button>`).join("")}</div>
         <p class="small" id="rnote" style="margin-top:8px">${esc(S.remindNote || "")}</p>
+      </section>
+
+      <section class="sec">
+        <h3>Awaaz aur alert</h3>
+        <p>Jab koi photo daale, dil ki baat likhe, aapki photo pe stamp lagaye ya jawab de, toh upar ek chhota sa message aayega. Har baat ki apni alag awaaz hai.</p>
+        <div class="chips">${[["all","Awaaz ke saath"],["quiet","Bina awaaz"],["off","Band"]].map(([v, l]) => `<button type="button" data-act="alerts" data-v="${v}" aria-pressed="${alertsMode() === v}">${l}</button>`).join("")}</div>
+        ${alertsMode() === "all" ? `<p class="small" style="margin:12px 0 8px">Sun ke dekho:</p>
+        <div class="chips">${[["photo","📷 Nayi photo"],["dil","💌 Dil ki baat"],["comment","💬 Jawab"],["stamp","🌟 Stamp"],["react","❤️ Reaction"],["doodle","✏️ Doodle"],["join","🎉 Koi juda"],["cele","🎊 Sabne daali"]].map(([k, l]) => `<button type="button" data-act="sfx" data-k="${k}">${l}</button>`).join("")}</div>
+        <p class="small" style="margin-top:8px">Awaaz na aaye toh phone ka volume aur silent switch dekho.</p>` : ""}
       </section>
 
       <section class="foot">
@@ -1323,7 +1504,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
         if (up.error) throw up.error;
         const ins = await S.sb.from("posts").insert({ family_id:S.fam.id, member:S.me, tag, caption, day, path });
         if (ins.error) throw ins.error;
-        closeSheet();
+        closeSheet(); SFX.play("photo");
         S.day = todayKey(); S.filter = "all"; loadDay();
       } catch (err) {
         const big = /size|large|413/i.test(String(err?.message || err?.statusCode || ""));
@@ -1377,7 +1558,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       const { error } = await S.sb.from("confessions").insert({ id, family_id:S.fam.id, member: gupt ? null : S.me, mood, mood_label, body:text, prompt, day: todayKey() });
       if (error) { $("#dErr").textContent = "Nahi chipka paaye. Net check karke dobara try karo."; send.disabled = false; send.textContent = "Chipka do"; return; }
       mine.add(id);
-      closeSheet();
+      closeSheet(); SFX.play("dil");
       S.day = todayKey(); S.filter = "all"; loadDay();
     });
   }
@@ -1434,7 +1615,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       const body = $("#ci").value.trim().slice(0, 300); if (!body) return;
       const row = { id:uid(), family_id:S.fam.id, post_id:p.id, member:S.me, body, ts:new Date().toISOString() };
       $("#ci").value = "";
-      S.comments.push(row); refreshView(); render();
+      S.comments.push(row); SFX.play("comment"); refreshView(); render();
       const { error } = await S.sb.from("comments").insert({ id:row.id, family_id:row.family_id, post_id:row.post_id, member:row.member, body });
       if (error) { S.comments = S.comments.filter(c => c !== row); refreshView(); render(); $("#vErr").textContent = "Comment nahi gaya. Dobara try karo."; }
     };
@@ -1445,6 +1626,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     else if (a === "stamp") {
       const k = t.dataset.k, has = S.preacts.find(r => r.post_id === p.id && r.kind === k && r.member === S.me);
       S.preacts = has ? S.preacts.filter(r => r !== has) : [...S.preacts, { post_id:p.id, member:S.me, kind:k }];
+      SFX.play(has ? "remove" : "stamp");
       refreshView(); render();
       const { error } = has
         ? await S.sb.from("photo_reactions").delete().eq("post_id", p.id).eq("member", S.me).eq("kind", k)
@@ -1454,18 +1636,18 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     else if (a === "hidedd") { S.hideDoodles = !S.hideDoodles; refreshView(); }
     else if (a === "deldd") {
       const mineIds = S.doodles.filter(d => d.post_id === p.id && d.member === S.me).map(d => d.id);
-      S.doodles = S.doodles.filter(d => !mineIds.includes(d.id)); refreshView(); render();
+      S.doodles = S.doodles.filter(d => !mineIds.includes(d.id)); SFX.play("remove"); refreshView(); render();
       await S.sb.from("doodles").delete().in("id", mineIds);
     }
     else if (a === "delc") {
-      const id = t.dataset.id; S.comments = S.comments.filter(c => c.id !== id); refreshView(); render();
+      const id = t.dataset.id; S.comments = S.comments.filter(c => c.id !== id); SFX.play("remove"); refreshView(); render();
       await S.sb.from("comments").delete().eq("id", id);
     }
     else if (a === "delpost") {
       if (t.dataset.armed !== "1") { t.dataset.armed = "1"; t.textContent = "Pakka hatana hai?"; return; }
       const { error } = await S.sb.from("posts").delete().eq("id", p.id);
       if (error) { $("#vErr").textContent = "Hata nahi paaye. Dobara try karo."; return; }
-      S.sheetPost = null; closeSheet(); loadDay(true);
+      S.sheetPost = null; closeSheet(); SFX.play("remove"); loadDay(true);
     }
     else if (a === "doodle") doodleMode(p);
   }
@@ -1498,7 +1680,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       $("#ds").disabled = true;
       const { error } = await S.sb.from("doodles").insert(row);
       if (error) { $("#dErr").textContent = "Save nahi hua. Dobara try karo."; $("#ds").disabled = false; return; }
-      S.doodles.push(Object.assign({ ts:new Date().toISOString() }, row)); S.hideDoodles = false; refreshView(); render();
+      S.doodles.push(Object.assign({ ts:new Date().toISOString() }, row)); S.hideDoodles = false; SFX.play("doodle"); refreshView(); render();
     };
   }
 
@@ -1523,7 +1705,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       const a = await S.sb.from("push_subs").upsert({ endpoint:j.endpoint, family_id:S.fam.id, member:me.id, p256dh:j.keys.p256dh, auth:j.keys.auth }, { onConflict:"endpoint" });
       const b = await S.sb.from("members").update({ remind_at:h }).eq("id", me.id);
       if (a.error || b.error) return note("Save nahi hua. Dobara try karo.");
-      me.remind_at = h; note(`Ho gaya! Roz ${REMIND.find(r => r[1] === h)[0].toLowerCase()} baje yaad dilayenge, agar tab tak kuch nahi daala.`); render();
+      me.remind_at = h; SFX.play("ting"); note(`Ho gaya! Roz ${REMIND.find(r => r[1] === h)[0].toLowerCase()} baje yaad dilayenge, agar tab tak kuch nahi daala.`); render();
     } catch { note("Reminder chalu nahi ho paaya. Thodi der baad dobara try karo."); }
   }
 
@@ -1531,6 +1713,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     const has = S.reacts.find(r => r.confession_id === cid && r.kind === kind && r.member === S.me);
     const before = S.reacts;
     S.reacts = has ? S.reacts.filter(r => r !== has) : [...S.reacts, { confession_id:cid, member:S.me, kind }];
+    SFX.play(has ? "remove" : "react");
     render();
     const { error } = has
       ? await S.sb.from("reactions").delete().eq("confession_id", cid).eq("member", S.me).eq("kind", kind)
@@ -1545,7 +1728,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     armedChit = null; btn.disabled = true;
     const { error } = await S.sb.from("confessions").delete().eq("id", id);
     if (error) { btn.disabled = false; btn.textContent = "Hata nahi paaye"; return; }
-    S.conf = S.conf.filter(c => c.id !== id); render();
+    S.conf = S.conf.filter(c => c.id !== id); SFX.play("remove"); render();
   }
 
   async function copyLink(btn){
@@ -1570,7 +1753,9 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     else if (a === "react") toggleReact(t.dataset.id, t.dataset.k);
     else if (a === "delchit") deleteChit(t);
     else if (a === "relpick") relSheet(t.dataset.id);
-    else if (a === "acceptrel") setRelation(t.dataset.id, t.dataset.l).then(render);
+    else if (a === "acceptrel") setRelation(t.dataset.id, t.dataset.l).then(ok => { if (ok) SFX.play("ting"); render(); });
+    else if (a === "alerts") { ls.set("fkd-alerts", t.dataset.v); render(); if (t.dataset.v === "all") SFX.play("ting"); }
+    else if (a === "sfx") SFX.play(t.dataset.k);
     else if (a === "editme") editMeSheet();
     else if (a === "drawmark") markSheet();
     else if (a === "install") doInstall();
