@@ -584,7 +584,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     S.offline = false; S.posts = p.data || []; S.conf = c.data || []; S.reacts = r.data || [];
     S.preacts = pr.data || []; S.comments = cm.data || []; S.doodles = dd.data || [];
     render();
-    if (S.sheetPost && !scrim.hidden) refreshView();
+    if (S.sheetPost && !scrim.hidden && !$("#pad")) refreshView();  // don't wipe a doodle in progress
   }
 
   /* ================= onboarding ================= */
