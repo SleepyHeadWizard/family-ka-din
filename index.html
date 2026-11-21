@@ -31,6 +31,8 @@
   --chit-b:#DDEBF1; --chit-y:#F5ECC2; --chit-p:#FCE3C2;
   --gupt:#3A3527;
   --tape:rgba(255,255,255,.72);
+  /* 8-pt spacing scale */
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;
   --error:#A3271B;
   --shadow:0 1px 2px rgba(31,28,18,.06),0 6px 18px rgba(31,28,18,.08);
   --display:"Yatra One","Mukta",Georgia,serif;
@@ -181,7 +183,7 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;
 
 /* sheets */
 .scrim{position:fixed;inset:0;z-index:10;background:rgba(15,13,8,.55);display:flex;align-items:flex-end;justify-content:center}
-.sheet{background:var(--surface);width:100%;max-width:560px;max-height:92%;overflow:auto;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
+.sheet{background:var(--surface);width:100%;max-width:560px;max-height:92%;overflow:auto;border-radius:20px 20px 0 0;padding:var(--s5) 20px calc(var(--s5) + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:var(--s4)}
 .sheet h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0;color:var(--primary)}
 .sheet p{margin:0}
 .pick{display:grid;place-items:center;min-height:190px;border:2px dashed var(--line);border-radius:14px;color:var(--muted);text-align:center;padding:12px;cursor:pointer;overflow:hidden}
@@ -252,7 +254,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 /* hand-drawn stamps (rough.js draws the ink ring) */
 /* Quiet pills by default; the hand-drawn ink ring appears only on the stamps YOU put on, so it means something. */
 .stamps{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.stamp{position:relative;display:inline-flex;align-items:center;min-height:40px;border:1.5px solid var(--line);border-radius:999px;background:none;padding:6px 14px;font-family:var(--hand);font-weight:700;font-size:16px;line-height:1.2;color:var(--muted)}
+.stamp{position:relative;display:inline-flex;align-items:center;min-height:44px;border:1.5px solid var(--line);border-radius:999px;background:none;padding:6px 14px;font-family:var(--hand);font-weight:700;font-size:15px;line-height:1.2;color:var(--muted)}
 .stamp[aria-pressed="true"]{color:var(--primary);border-color:transparent}
 .stamp .ink{position:absolute;left:-4px;top:-4px;pointer-events:none;overflow:visible}
 .stamp .ink.on path:first-child{opacity:.22}
@@ -278,7 +280,16 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 .srcbtn svg{width:22px;height:22px;flex:none}
 .src.mini{flex-direction:row;gap:8px}
 .src.mini .srcbtn{flex:1;min-height:44px;font-size:15px;background:none;color:var(--primary)}
-.sep{border:0;border-top:1px solid var(--line);margin:2px 0;width:100%}
+.sep{border:0;border-top:1px solid var(--line);margin:0;width:100%}
+/* Photo sheet: 8-pt spacing scale. Inside a group 12px (tight: 8px), between groups 24px (proximity rule). */
+#vs{display:flex;flex-direction:column;gap:var(--s5)}
+.vg{display:flex;flex-direction:column;gap:var(--s3);min-width:0}
+.vg.tight{gap:var(--s2)}
+.vlbl{margin:0;font-family:var(--body);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tool{align-self:flex-start;display:inline-flex;align-items:center;gap:var(--s2);min-height:44px;padding:0 var(--s4);border:1.5px solid var(--primary);border-radius:12px;background:none;color:var(--primary);font-weight:600}
+.tool svg{width:20px;height:20px;flex:none}
+.vg.foot{gap:var(--s2);align-items:stretch}
+.dangerlink{align-self:center;min-height:44px;padding:0 var(--s4);border:0;background:none;color:var(--error);font-weight:600;text-decoration:underline;text-underline-offset:3px}
 .pw.draw svg#pad{pointer-events:auto;touch-action:none;cursor:crosshair}
 .big .pw > img{border-radius:12px}
 /* full view: tall photos stay within ~60% of the screen so stamps and comments are visible; box hugs the image so doodles line up */
@@ -1355,22 +1366,37 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     const cms = S.comments.filter(c => c.post_id === p.id);
     const dds = S.doodles.filter(d => d.post_id === p.id);
     const myDd = dds.filter(d => d.member === S.me);
-    box.innerHTML = `<div class="big">${photoHTML(p, (TAGS[p.tag]||"Pal")+", "+mName(p.member))}</div>
-      <div class="meta" style="padding:0">${whoHTML(p.member)}<span class="tag t-${esc(p.tag||"pal")}">${esc(TAGS[p.tag]||"Pal")}</span><time>${tstr(p.ts)} ${ap(h)}, ${tod(h)}</time></div>
-      <div class="stamps">${PHOTO_STAMPS.map(([k, l]) => { const n = rx.filter(r => r.kind === k).length; const on = rx.some(r => r.kind === k && r.member === S.me);
-        return `<button type="button" class="stamp" data-vact="stamp" data-k="${k}" data-id="${esc(p.id)}" aria-pressed="${on}"><span>${l}${n?`<b>${n}</b>`:""}</span></button>`; }).join("")}</div>
-      ${rx.length ? `<p class="small">${[...new Set(rx.map(r => r.member))].map(m => esc(mLabel(m))).join(", ")} ne stamp lagaya</p>` : ""}
-      <div class="ddlist"><button type="button" class="btn" data-vact="doodle" style="flex:none;padding:8px 14px">Photo pe kuch banao</button>
-        ${dds.length ? `<span>${dds.length} doodle: ${[...new Set(dds.map(d => d.member))].map(m => esc(mLabel(m))).join(", ")}</span>
-        <button type="button" class="linkish" data-vact="hidedd">${S.hideDoodles ? "Doodle dikhao" : "Doodle chhupao"}</button>` : ""}
-        ${myDd.length ? `<button type="button" class="linkish" data-vact="deldd" style="color:var(--error)">Mera doodle hatao</button>` : ""}</div>
+    // Layout follows an 8-pt scale and the proximity rule: 8–12px inside a group, 24px between groups.
+    const PEN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg>`;
+    box.innerHTML = `
+      <section class="vg">
+        <div class="big">${photoHTML(p, (TAGS[p.tag]||"Pal")+", "+mName(p.member))}</div>
+        <div class="meta" style="padding:0">${whoHTML(p.member)}<span class="tag t-${esc(p.tag||"pal")}">${esc(TAGS[p.tag]||"Pal")}</span><time>${tstr(p.ts)} ${ap(h)}, ${tod(h)}</time></div>
+      </section>
+      <section class="vg tight">
+        <h3 class="vlbl">Stamp lagao</h3>
+        <div class="stamps">${PHOTO_STAMPS.map(([k, l]) => { const n = rx.filter(r => r.kind === k).length; const on = rx.some(r => r.kind === k && r.member === S.me);
+          return `<button type="button" class="stamp" data-vact="stamp" data-k="${k}" data-id="${esc(p.id)}" aria-pressed="${on}"><span>${l}${n?`<b>${n}</b>`:""}</span></button>`; }).join("")}</div>
+        ${rx.length ? `<p class="small">${[...new Set(rx.map(r => r.member))].map(m => esc(mLabel(m))).join(", ")} ne stamp lagaya</p>` : ""}
+      </section>
+      <section class="vg tight">
+        <button type="button" class="tool" data-vact="doodle">${PEN}Photo pe kuch banao</button>
+        ${dds.length ? `<p class="small ddlist"><span>${dds.length} doodle: ${[...new Set(dds.map(d => d.member))].map(m => esc(mLabel(m))).join(", ")}</span>
+          <button type="button" class="linkish" data-vact="hidedd">${S.hideDoodles ? "Doodle dikhao" : "Doodle chhupao"}</button>
+          ${myDd.length ? `<button type="button" class="linkish" data-vact="deldd" style="color:var(--error)">Mera doodle hatao</button>` : ""}</p>` : ""}
+      </section>
       <hr class="sep">
-      <div class="cmts">${cms.map(c => `<div class="cmt">${dotHTML(c.member)}<div><b>${esc(mName(c.member))}</b>${mRel(c.member)?` <span class="rel">· ${esc(mRel(c.member))}</span>`:""}<time>${tstr(c.ts)}</time><p>${esc(c.body)}</p>
-          ${c.member === S.me ? `<button type="button" class="x" data-vact="delc" data-id="${esc(c.id)}">hatao</button>` : ""}</div></div>`).join("")}</div>
-      <form class="row" id="cf"><input class="field" id="ci" maxlength="300" placeholder="Kuch kaho…" aria-label="Comment likho" autocomplete="off"><button type="submit" class="btn pri" style="flex:none">Bhejo</button></form>
-      <p class="err" id="vErr"></p>
-      <hr class="sep">
-      <div class="row">${p.member === S.me ? `<button type="button" class="btn warn" data-vact="delpost">Photo hatao</button>` : ""}<button type="button" class="btn" data-vact="close">Band karo</button></div>`;
+      <section class="vg">
+        ${cms.length ? `<h3 class="vlbl">Jawab · ${cms.length}</h3>` : ""}
+        ${cms.length ? `<div class="cmts">${cms.map(c => `<div class="cmt">${dotHTML(c.member)}<div><b>${esc(mName(c.member))}</b>${mRel(c.member)?` <span class="rel">· ${esc(mRel(c.member))}</span>`:""}<time>${tstr(c.ts)}</time><p>${esc(c.body)}</p>
+          ${c.member === S.me ? `<button type="button" class="x" data-vact="delc" data-id="${esc(c.id)}">hatao</button>` : ""}</div></div>`).join("")}</div>` : ""}
+        <form class="row" id="cf"><input class="field" id="ci" maxlength="300" placeholder="Kuch kaho…" aria-label="Comment likho" autocomplete="off"><button type="submit" class="btn pri" style="flex:none">Bhejo</button></form>
+        <p class="err" id="vErr"></p>
+      </section>
+      <section class="vg foot">
+        <button type="button" class="btn" data-vact="close">Band karo</button>
+        ${p.member === S.me ? `<button type="button" class="dangerlink" data-vact="delpost">Yeh photo hatao</button>` : ""}
+      </section>`;
     $("#ci").value = keep;
     decorateStamps(box);
     $("#cf").onsubmit = async e => {
