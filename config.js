@@ -6,5 +6,5 @@ window.FAMILY_CONFIG = {
   supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5Ym1qb2d4a3R2cmd5a2lxeXNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUyNDEyMTUsImV4cCI6MjExMDgxNzIxNX0.jB2k4pF7kjJvaGfEi6fwZvDayTodUfsQvh2d-4ELZN8",
   // Optional, for daily reminders: the PUBLIC key from `npx @pushforge/builder vapid`.
   // Leave empty to turn reminders off.
-  vapidPublicKey: ""
+  vapidPublicKey: "BN7il9-5pme8p4ilRaHk_zG2-Y8XxqCKGLvSHeefCQ-33UTDdst_BiFMm20pEM0dPDS6Xk6ZUJX4RYuFFuNeFo4"
 };
