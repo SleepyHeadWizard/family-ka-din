@@ -100,7 +100,6 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;
 .tod{font-size:13px;color:var(--muted)}
 .cards{display:flex;flex-direction:column;gap:12px;border-left:2px solid var(--line);padding-left:14px;min-width:0}
 .card{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;border:0;padding:0;text-align:left;width:100%}
-.card img{display:block;width:100%;max-height:420px;object-fit:cover;background:var(--sunk)}
 .meta{display:flex;align-items:center;gap:8px;padding:10px 12px 0;font-size:15px;flex-wrap:wrap}
 .nm{display:flex;align-items:center;gap:6px;font-weight:600;min-width:0}
 .nm .rel{font-weight:500;color:var(--muted)}
@@ -108,7 +107,6 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;
 .meta time{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums}
 .tag{font-size:13px;font-weight:600;border-radius:999px;padding:1px 9px;border:1.5px solid currentColor}
 .t-kaam{color:var(--kaam)}.t-khana{color:var(--khana)}.t-pal{color:var(--pal)}
-.cap{margin:4px 12px 0;font-size:16px;overflow-wrap:anywhere}
 .card .pad{height:12px}
 .imgfail{display:grid;place-items:center;height:160px;background:var(--sunk);color:var(--muted);font-size:14px}
 
@@ -170,7 +168,6 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;
 .mrow .info strong{font-size:17px}
 .mrow .info span{font-size:14px;color:var(--muted)}
 .mrow .info span b{color:var(--ink);font-weight:600}
-.pill{font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--sunk);color:var(--ink);white-space:nowrap}
 .chev{color:var(--muted);font-size:20px}
 .sugg{background:var(--sunk);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
 .sugg p{margin:0;font-size:16px}
@@ -191,9 +188,8 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;
 .sheet{background:var(--surface);width:100%;max-width:560px;max-height:92%;overflow:auto;border-radius:20px 20px 0 0;padding:var(--s5) 20px calc(var(--s5) + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:var(--s4)}
 .sheet h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0;color:var(--primary)}
 .sheet p{margin:0}
-.pick{display:grid;place-items:center;min-height:190px;border:2px dashed var(--line);border-radius:14px;color:var(--muted);text-align:center;padding:12px;cursor:pointer;overflow:hidden}
-.pick{gap:12px;cursor:default;min-height:150px}
-.pick .pw{display:inline-block;max-width:100%}
+.pick{display:grid;place-items:center;gap:12px;min-height:150px;border:2px dashed var(--line);border-radius:14px;color:var(--muted);text-align:center;padding:12px;overflow:hidden}
+.pick .pw,.big .pw{display:inline-block;max-width:100%}
 .pick .pw > img{width:auto;max-width:100%;max-height:300px;border-radius:10px;display:block}
 .tags{display:flex;gap:8px;border:0;margin:0;padding:0}
 .tags legend{font-size:14px;color:var(--muted);margin-bottom:6px;padding:0}
@@ -216,7 +212,8 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;
 .chips button{border:1.5px solid var(--line);background:var(--bg);border-radius:999px;padding:5px 13px;font-size:15px;font-weight:600}
 .chips button[aria-pressed="true"]{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
 .chips button.sug{border-color:var(--primary);border-style:dashed}
-.grp{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:2px 0 -6px}
+.grp,.vlbl{margin:0;font-family:var(--body);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.grp{margin:2px 0 -6px}
 .field{width:100%;border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 12px}
 textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-size:20px;line-height:1.35}
 .compose{border-radius:12px;padding:2px;transition:background .2s}
@@ -235,7 +232,10 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 .err:empty{display:none}
 .small{font-size:14px;color:var(--muted)}
 .linkish{border:0;background:none;padding:0;color:var(--primary);font-weight:600;text-decoration:underline}
-.big img{width:100%;border-radius:12px;display:block}
+.linkish.mid{align-self:center}
+.linkish.warn{color:var(--error)}
+.stack{display:flex;flex-direction:column;gap:10px}
+.sheet .stack{gap:var(--s3)}
 
 /* onboarding */
 .onb{min-height:100vh;max-width:460px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top)) 20px 40px;display:flex;flex-direction:column;gap:18px}
@@ -243,7 +243,6 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 .onb h2{font-family:var(--display);font-weight:400;font-size:30px;line-height:1.1;margin:8px 0 0;color:var(--primary);text-wrap:balance}
 .onb p{margin:0;color:var(--muted)}
 .onb .lead{font-size:18px;color:var(--ink)}
-.onb .stack{display:flex;flex-direction:column;gap:10px}
 .onb label.lbl{font-size:14px;font-weight:600;color:var(--muted);margin-bottom:-10px}
 .onb > .btn{flex:none}
 .onb .back{align-self:flex-start;border:0;background:none;color:var(--primary);font-weight:600;padding:0}
@@ -255,14 +254,13 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 .steps i{flex:1;height:4px;border-radius:2px;background:var(--line)}
 .steps i.on{background:var(--primary)}
 .code-in{font-family:var(--display);font-size:30px;letter-spacing:.18em;text-transform:uppercase;text-align:center}
-.relrows{display:flex;flex-direction:column;gap:8px}
 /* hand-drawn stamps (rough.js draws the ink ring) */
 /* Quiet pills by default; the hand-drawn ink ring appears only on the stamps YOU put on, so it means something. */
 .stamps{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .stamp{position:relative;display:inline-flex;align-items:center;min-height:44px;border:1.5px solid var(--line);border-radius:999px;background:none;padding:6px 14px;font-family:var(--hand);font-weight:700;font-size:15px;line-height:1.2;color:var(--muted)}
 .stamp[aria-pressed="true"]{color:var(--primary);border-color:transparent}
 .stamp .ink{position:absolute;left:-4px;top:-4px;pointer-events:none;overflow:visible}
-.stamp .ink.on path:first-child{opacity:.22}
+.stamp .ink path:first-child{opacity:.22}
 .stamp > span{position:relative}
 .stamp b{font-family:var(--body);font-size:13px;margin-left:6px;font-variant-numeric:tabular-nums}
 .chit .stamp{font-size:15px;padding:5px 12px;min-height:38px}
@@ -271,7 +269,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 /* doodles over photos */
 .pw{position:relative;display:block}
 .pw > img{display:block;width:100%}
-.card .pw > img{aspect-ratio:4/3;height:auto;max-height:none;object-fit:cover;background:var(--sunk)}  /* same preview frame for every photo; full photo opens on tap */
+.card .pw > img{aspect-ratio:4/3;object-fit:cover;background:var(--sunk)}  /* same preview frame for every photo; full photo opens on tap */
 .pw svg.dd{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 /* caption written on the photo, over a soft dark fade so it reads on any picture */
 .pw .ov{position:absolute;left:0;right:0;bottom:0;padding:36px 14px 12px;background:linear-gradient(to top,rgba(15,13,8,.8),rgba(15,13,8,0));color:#fff;font-family:var(--hand);font-weight:700;font-size:20px;line-height:1.25;text-shadow:0 1px 2px rgba(0,0,0,.45);overflow-wrap:anywhere;pointer-events:none;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
@@ -290,17 +288,14 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 #vs{display:flex;flex-direction:column;gap:var(--s5)}
 .vg{display:flex;flex-direction:column;gap:var(--s3);min-width:0}
 .vg.tight{gap:var(--s2)}
-.vlbl{margin:0;font-family:var(--body);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .tool{align-self:flex-start;display:inline-flex;align-items:center;gap:var(--s2);min-height:44px;padding:0 var(--s4);border:1.5px solid var(--primary);border-radius:12px;background:none;color:var(--primary);font-weight:600}
 .tool svg{width:20px;height:20px;flex:none}
 .vg.foot{gap:var(--s2);align-items:stretch}
 .dangerlink{align-self:center;min-height:44px;padding:0 var(--s4);border:0;background:none;color:var(--error);font-weight:600;text-decoration:underline;text-underline-offset:3px}
 .pw.draw svg#pad{pointer-events:auto;touch-action:none;cursor:crosshair}
-.big .pw > img{border-radius:12px}
 /* full view: tall photos stay within ~60% of the screen so stamps and comments are visible; box hugs the image so doodles line up */
 .big{display:flex;justify-content:center}
-.big .pw{display:inline-block;max-width:100%}
-.big .pw > img{width:auto;max-width:100%;max-height:60vh;background:var(--sunk)}
+.big .pw > img{width:auto;max-width:100%;max-height:60vh;border-radius:12px;background:var(--sunk)}
 .pens{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .pens button{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);padding:0}
 .pens button[aria-pressed="true"]{outline:3px solid var(--primary);outline-offset:2px}
@@ -382,12 +377,15 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 
 <div class="scrim" id="scrim" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
 
+<!-- Every library is pinned AND hash-checked (integrity): if the CDN ever served
+     different code, the browser refuses to run it. Update the hash with the version. -->
+<script type="importmap">{"integrity":{"https://cdn.jsdelivr.net/npm/perfect-freehand@1.2.2/dist/esm/index.mjs":"sha384-5l3A2yfUaPsFT9OELkOpJOX0+bzd81Hi6euWa2tIwITOu+z8k9dMuxvIu78wYkxL"}}</script>
 <script src="config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js" integrity="sha384-2zrRDgDHSYB/GN3nFW3fsZXoxEhKIr3N2h63Tc6DEOB9JJdFIu8xMJT2Cph/gBil" crossorigin="anonymous"></script>
 <!-- Open-source, MIT/ISC licensed: hand-drawn shapes, sketchy annotations, petal confetti -->
-<script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/rough-notation@0.5.1/lib/rough-notation.iife.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js" integrity="sha384-1NLkwxMO2sOqcq7rQkFBhIAUJtbt8ziLxhVKVgKfFGMEU8pF+GEq5LVogviveup6" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/rough-notation@0.5.1/lib/rough-notation.iife.js" integrity="sha384-IW2mAEaBUcGJfuKi7uhlzpZGhnDDnjI9NLtADxl9xKV6VJPzuuIqhIKyLwiAuRmu" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.js" integrity="sha384-/Ko/tqVwPYurnBe+Mj8WWw+39WmyOZn/kU+neqXn4hRxGI575k07mB/hIekAT51+" crossorigin="anonymous"></script>
 <script>
 (() => {
   /* ================= helpers ================= */
@@ -401,6 +399,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   const VAAR = ["Ravivar","Somvar","Mangalvar","Budhvar","Guruvar","Shukravar","Shanivar"];
   const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const TAGS = { kaam:"Kaam", khana:"Khana", pal:"Pal" };
+  const tagName = p => TAGS[p.tag] || "Pal";
   const tod = h => h>=4&&h<12 ? "subah" : h>=12&&h<16 ? "dopahar" : h>=16&&h<20 ? "shaam" : "raat";
   const h12 = h => (h%12)||12;
   const ap = h => h<12 ? "am" : "pm";
@@ -411,10 +410,13 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     set(k,v){ try { localStorage.setItem(k,v); } catch {} },
     del(k){ try { localStorage.removeItem(k); } catch {} }
   };
+  const forgetDevice = () => { ls.del("fkd-me"); ls.del("fkd-code"); location.href = location.pathname; };
+  // Ids of notes written on this phone (so a Gupt note can be deleted from here). Read once.
   const mine = {
-    list(){ try { return JSON.parse(ls.get("fkd-mine") || "[]"); } catch { return []; } },
-    add(id){ const l = mine.list(); l.push(id); ls.set("fkd-mine", JSON.stringify(l.slice(-500))); },
-    has(id){ return mine.list().includes(id); }
+    ids: null,
+    load(){ if (!this.ids) { try { this.ids = JSON.parse(ls.get("fkd-mine") || "[]"); } catch { this.ids = []; } } return this.ids; },
+    add(id){ this.ids = [...this.load(), id].slice(-500); ls.set("fkd-mine", JSON.stringify(this.ids)); },
+    has(id){ return this.load().includes(id); }
   };
 
   /* ================= content ================= */
@@ -476,6 +478,8 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   inv(["Dost"], "Dost", "Dost");
   const inverseOf = (label, ownerGender) => { const e = INV[label]; return e && ownerGender ? e[ownerGender] : null; };
 
+  const genderPick = (name, cur, legend) => `<fieldset class="tags"><legend>${legend}</legend>${[["m","Ladka"],["f","Ladki"],["","Rehne do"]]
+    .map(([v, l]) => `<label><input type="radio" name="${name}" value="${v}" ${(cur || "") === v ? "checked" : ""}><span>${l}</span></label>`).join("")}</fieldset>`;
   const COLORS = ["#A35A00","#064F6E","#6E5F10","#1F6F93","#7A4A00","#4A4010"];
 
   /* ================= state ================= */
@@ -484,7 +488,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     sb:null, fam:null, members:[], rel:{}, relIn:[], me: ls.get("fkd-me"),
     mode: ["dil","parivaar"].includes(ls.get("fkd-mode")) ? ls.get("fkd-mode") : "photos",
     day: todayKey(), posts:[], conf:[], reacts:[], preacts:[], comments:[], doodles:[], view:"timeline", filter:"all",
-    loading:true, offline:false, poll:null, reqId:0, started:false
+    loading:true, offline:false, reqId:0, started:false
   };
   const member = id => S.members.find(m => m.id === id);
   const meM = () => member(S.me);
@@ -494,6 +498,10 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   const mColor = id => (member(id)?.color) || "#6B6450";
   const initial = n => (String(n||"?").trim()[0] || "?").toUpperCase();
   const others = () => S.members.filter(m => m.id !== S.me);
+  const meFirst = () => [meM(), ...others()].filter(Boolean);
+  const namesOf = rows => [...new Set(rows.map(r => r.member))].map(m => esc(mLabel(m))).join(", ");
+  const nameTaken = name => S.members.some(m => m.name.toLowerCase() === name.toLowerCase());
+  const newMember = (name, gender, extra) => Object.assign({ id:uid(), family_id:S.fam.id, name, gender, color:COLORS[S.members.length % COLORS.length] }, extra);
   const photoUrl = path => S.sb.storage.from("photos").getPublicUrl(path).data.publicUrl;
   // Untrusted drawing data from the database: only allow plain path syntax.
   const okPath = d => typeof d === "string" && d.length < 20000 && /^[MQTLCZmqtlcz0-9 ,.\-]+$/.test(d);
@@ -505,18 +513,29 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   const whoHTML = id => `<span class="nm">${dotHTML(id)}${esc(mName(id))}${mRel(id)?`<span class="rel">· ${esc(mRel(id))}</span>`:""}</span>`;
 
   /* ---------- hand-drawn bits ---------- */
+  const icon = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const ICON = {
+    cam: icon('<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'),
+    gal: icon('<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 17l-5-5-9 8"/>'),
+    pen: icon('<path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/>')
+  };
   const PHOTO_STAMPS = [["wah","Wah!"],["nazar","Nazar na lage"],["bhook","Bhook lag gayi"],["shabaash","Shabaash"],["dil","Dil se"]];
+  const countOf = (rx, k) => rx.filter(r => r.kind === k).length;
+  // A row of reaction stamps (Dil Ki Baat notes and photos). attr = how a tap is wired.
+  const stampBtns = (defs, rx, attr) => defs.map(([k, l]) => {
+    const n = countOf(rx, k), on = rx.some(r => r.kind === k && r.member === S.me);
+    return `<button type="button" class="stamp" ${attr} data-k="${k}" aria-pressed="${on}"><span>${esc(l)}${n ? `<b>${n}</b>` : ""}</span></button>`;
+  }).join("");
   const seedOf = s => { let h = 7; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return (h % 9999) + 1; };
   function decorateStamps(root){
     if (!window.rough) return;
     (root || document).querySelectorAll('.stamp[aria-pressed="true"]:not([data-inked])').forEach(b => {
       const w = b.offsetWidth, h = b.offsetHeight; if (!w) return;
       const NS = "http://www.w3.org/2000/svg", svg = document.createElementNS(NS, "svg");
-      const on = b.getAttribute("aria-pressed") === "true";
-      svg.setAttribute("class", "ink" + (on ? " on" : "")); svg.setAttribute("width", w + 8); svg.setAttribute("height", h + 8);
+      svg.setAttribute("class", "ink"); svg.setAttribute("width", w + 8); svg.setAttribute("height", h + 8);
       svg.setAttribute("viewBox", `0 0 ${w + 8} ${h + 8}`); svg.setAttribute("aria-hidden", "true");
-      const opts = { roughness:1.5, bowing:2.2, stroke:"currentColor", strokeWidth: on ? 2 : 1.3, seed: seedOf(b.dataset.k + "|" + (b.dataset.id || "")) };
-      if (on) Object.assign(opts, { fill:"currentColor", fillStyle:"hachure", hachureGap:4, fillWeight:0.8, hachureAngle:-35 });
+      const opts = { roughness:1.5, bowing:2.2, stroke:"currentColor", strokeWidth:2, seed: seedOf(b.dataset.k + "|" + (b.dataset.id || "")),
+        fill:"currentColor", fillStyle:"hachure", hachureGap:4, fillWeight:0.8, hachureAngle:-35 };
       svg.appendChild(rough.svg(svg).ellipse((w + 8) / 2, (h + 8) / 2, w + 2, h + 2, opts));
       b.prepend(svg); b.dataset.inked = "1";
     });
@@ -536,13 +555,17 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   async function drawPad(svg, w, h, opts){
     const { getStroke } = await loadPF();
     const strokes = []; let pts = null, live = null;
-    const toXY = e => { const r = svg.getBoundingClientRect(); return [ (e.clientX - r.left) / r.width * w, (e.clientY - r.top) / r.height * h, e.pressure || 0.5 ]; };
+    let rect = null, raf = 0;
+    const toXY = e => { const r = rect; return [ (e.clientX - r.left) / r.width * w, (e.clientY - r.top) / r.height * h, e.pressure || 0.5 ]; };
     const make = () => { const p = document.createElementNS("http://www.w3.org/2000/svg", "path"); p.setAttribute("fill", opts.color()); svg.appendChild(p); return p; };
     const outline = (pts, e) => strokePath(getStroke(pts, { size:opts.size, thinning:0.6, smoothing:0.5, streamline:0.5, simulatePressure: !e || e.pointerType !== "pen" }));
     let lastE = null;
-    svg.addEventListener("pointerdown", e => { e.preventDefault(); svg.setPointerCapture(e.pointerId); pts = [toXY(e)]; live = make(); lastE = e; });
-    svg.addEventListener("pointermove", e => { if (!pts) return; pts.push(toXY(e)); lastE = e; live.setAttribute("d", outline(pts, e)); });
-    const end = () => { if (!pts) return; const d = outline(pts, lastE); if (d) { live.setAttribute("d", d); strokes.push({ d, c: live.getAttribute("fill"), el: live }); } else live.remove(); pts = null; live = null; opts.onChange && opts.onChange(strokes.length); };
+    svg.addEventListener("pointerdown", e => { e.preventDefault(); svg.setPointerCapture(e.pointerId); rect = svg.getBoundingClientRect(); pts = [toXY(e)]; live = make(); lastE = e; });
+    svg.addEventListener("pointermove", e => {
+      if (!pts) return; pts.push(toXY(e)); lastE = e;
+      if (!raf) raf = requestAnimationFrame(() => { raf = 0; if (pts) live.setAttribute("d", outline(pts, lastE)); });
+    });
+    const end = () => { if (!pts) return; cancelAnimationFrame(raf); raf = 0; const d = outline(pts, lastE); if (d) { live.setAttribute("d", d); strokes.push({ d, c: live.getAttribute("fill"), el: live }); } else live.remove(); pts = null; live = null; opts.onChange && opts.onChange(strokes.length); };
     svg.addEventListener("pointerup", end); svg.addEventListener("pointercancel", end);
     return {
       strokes,
@@ -559,9 +582,11 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     shot(.1); setTimeout(() => shot(.9), 250);
   }
   const annotated = new Set();
+  let lastAnno = null;
   function annotate(el, key, opts){
     if (!el || !window.RoughNotation) return;
-    const a = RoughNotation.annotate(el, Object.assign({ animate: !annotated.has(key) }, opts));
+    if (lastAnno) lastAnno.remove();
+    const a = lastAnno = RoughNotation.annotate(el, Object.assign({ animate: !annotated.has(key) }, opts));
     annotated.add(key); a.show();
   }
 
@@ -715,11 +740,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       <form class="stack" id="f">
         <label class="lbl" for="nm">Aapka naam</label>
         <input class="field" id="nm" maxlength="30" placeholder="Jaise: Shiv" autocomplete="given-name">
-        <fieldset class="tags" id="g"><legend>Rishte sahi suggest karne ke liye (optional)</legend>
-          <label><input type="radio" name="g" value="m"><span>Ladka</span></label>
-          <label><input type="radio" name="g" value="f"><span>Ladki</span></label>
-          <label><input type="radio" name="g" value="" checked><span>Rehne do</span></label>
-        </fieldset>
+        ${genderPick("g", "", "Rishte sahi suggest karne ke liye (optional)")}
         <button class="btn go" type="submit">Register karo</button>
         <p class="err" id="err"></p>
       </form>
@@ -740,9 +761,9 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     $("#f").onsubmit = async e => {
       e.preventDefault();
       const name = $("#nm").value.trim(); if (!name) { $("#err").textContent = "Apna naam likho."; return; }
-      if (S.members.some(m => m.name.toLowerCase() === name.toLowerCase())) { $("#err").textContent = "Is naam se koi pehle se hai. Thoda alag likho, jaise surname ke saath."; return; }
+      if (nameTaken(name)) { $("#err").textContent = "Is naam se koi pehle se hai. Thoda alag likho, jaise surname ke saath."; return; }
       const gender = onb.querySelector("input[name=g]:checked")?.value || null;
-      const row = { id:uid(), family_id:S.fam.id, name, gender, color:COLORS[S.members.length % COLORS.length], claimed:true };
+      const row = newMember(name, gender, { claimed:true });
       const { error } = await S.sb.from("members").insert(row);
       if (error) { $("#err").textContent = "Register nahi ho paaya. Net check karke dobara try karo."; return; }
       S.me = row.id; ls.set("fkd-me", S.me); S.members.push(row); await loadRelations();
@@ -759,9 +780,9 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
         <div class="mrows" id="rl">${others().map(relRowHTML).join("")}</div>
         <div class="stack">
           <button type="button" class="btn go" id="done">Ho gaya, app kholo</button>
-          <button type="button" class="linkish" id="skip" style="align-self:center">Baad mein karunga</button>
+          <button type="button" class="linkish mid" id="skip">Baad mein karunga</button>
         </div>`);
-      $("#rl").onclick = e => { const b = e.target.closest("[data-rel]"); if (b) relSheet(b.dataset.rel, draw); };
+      $("#rl").onclick = e => { const b = e.target.closest("[data-id]"); if (b) relSheet(b.dataset.id, draw); };
       $("#done").onclick = () => startApp();
       $("#skip").onclick = () => startApp();
     };
@@ -772,7 +793,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     const r = S.rel[m.id];
     const given = S.relIn.find(x => x.owner === m.id);
     const sug = !r && given ? inverseOf(given.label, m.gender) : null;
-    return `<button type="button" class="mrow" data-rel="${esc(m.id)}">
+    return `<button type="button" class="mrow" data-act="relpick" data-id="${esc(m.id)}">
       <span class="ava" style="background:${esc(m.color)}">${avaInner(m.id)}</span>
       <span class="info"><strong>${esc(m.name)}</strong>
         <span>${r ? `Mere liye: <b>${esc(r)}</b>` : sug ? `Suggestion: <b>${esc(sug)}</b>` : "Rishta chuno"}${!m.claimed ? " · abhi juda nahi" : ""}</span></span>
@@ -817,10 +838,10 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     if (!S.started) {
       S.started = true;
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => render());
-      S.poll = setInterval(() => { if (!document.hidden && !$("#app").hidden) loadDay(true); }, 30000);
+      setInterval(() => { if (!document.hidden && !$("#app").hidden) loadDay(true); }, 30000);
       document.addEventListener("visibilitychange", async () => {
         if (document.hidden || $("#app").hidden) return;
-        await loadMembers(); await loadRelations(); loadDay(true);
+        await Promise.all([loadMembers(), loadRelations()]); loadDay(true);
       });
       new ResizeObserver(() => document.documentElement.style.setProperty("--hdr", $("#hdr").offsetHeight + "px")).observe($("#hdr"));
     }
@@ -854,7 +875,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     const counts = {}; let gupt = 0;
     items.forEach(p => { if (p.member) counts[p.member] = (counts[p.member]||0)+1; else gupt++; });
     let h = `<button type="button" data-act="filter" data-k="all" class="${S.filter==="all"?"on":""}" aria-pressed="${S.filter==="all"}"><span class="ava all">Sab</span>${items.length} ${dil?(items.length===1?"baat":"baatein"):"photo"}</button>`;
-    const ordered = [...S.members.filter(m => m.id === S.me), ...others()];
+    const ordered = meFirst();
     ordered.forEach(m => {
       const n = counts[m.id]||0, on = S.filter===m.id;
       h += `<button type="button" data-act="filter" data-k="${esc(m.id)}" class="${on?"on":""}" aria-pressed="${on}"><span class="ava ${n?"done":""}" style="background:${esc(m.color)}">${avaInner(m.id)}${n?`<span class="n">${n}</span>`:""}</span>${esc(mLabel(m.id))}</button>`;
@@ -871,14 +892,16 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   }
 
   const byFilter = list => S.filter==="all" ? list : S.filter==="gupt" ? list.filter(p => !p.member) : list.filter(p => p.member === S.filter);
+  const tagPill = p => `<span class="tag t-${esc(p.tag || "pal")}">${esc(tagName(p))}</span>`;
+  const emptyHTML = text => `<p class="empty">${S.loading ? "Load ho raha hai…" : text}</p>`;
   const img = (p, alt) => `<img src="${esc(photoUrl(p.path))}" alt="${esc(alt)}" loading="lazy" data-fail>`;
 
   function photoSummary(p){
     const rx = S.preacts.filter(r => r.post_id === p.id);
-    const bits = PHOTO_STAMPS.map(([k, l]) => { const n = rx.filter(r => r.kind === k).length; return n ? `<span>${esc(l)}<b>${n}</b></span>` : ""; }).filter(Boolean);
+    const bits = PHOTO_STAMPS.map(([k, l]) => { const n = countOf(rx, k); return n ? `<span>${esc(l)}<b>${n}</b></span>` : ""; }).filter(Boolean);
     const nc = S.comments.filter(c => c.post_id === p.id).length;
     const nd = S.doodles.filter(d => d.post_id === p.id).length;
-    if (nc) bits.push(`<span>${nc} ${nc === 1 ? "jawab" : "jawab"}</span>`);
+    if (nc) bits.push(`<span>${nc} jawab</span>`);
     if (nd) bits.push(`<span>${nd} doodle</span>`);
     return bits.length ? `<div class="psum">${bits.join("")}</div>` : "";
   }
@@ -887,8 +910,8 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   }
   function cardHTML(p){
     return `<button type="button" class="card" data-act="open" data-id="${esc(p.id)}">
-      ${photoHTML(p, `${TAGS[p.tag]||"Pal"}, ${mName(p.member)}`)}
-      <div class="meta">${whoHTML(p.member)}<span class="tag t-${esc(p.tag||"pal")}">${esc(TAGS[p.tag]||"Pal")}</span><time>${tstr(p.ts)}</time></div>
+      ${photoHTML(p, `${tagName(p)}, ${mName(p.member)}`)}
+      <div class="meta">${whoHTML(p.member)}${tagPill(p)}<time>${tstr(p.ts)}</time></div>
       ${photoSummary(p)}<div class="pad"></div></button>`;
   }
 
@@ -897,11 +920,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     const who = c.member ? whoHTML(c.member) : `<span class="nm"><span class="dot gupt">?</span>Gupt</span>`;
     const rx = S.reacts.filter(r => r.confession_id === c.id);
     const canDel = (c.member && c.member === S.me) || mine.has(c.id);
-    const btns = REACTS.map(([k, label]) => {
-      const n = rx.filter(r => r.kind === k).length;
-      const meOn = rx.some(r => r.kind === k && r.member === S.me);
-      return `<button type="button" class="stamp" data-act="react" data-id="${esc(c.id)}" data-k="${k}" aria-pressed="${meOn}"><span>${label}${n?`<b>${n}</b>`:""}</span></button>`;
-    }).join("");
+    const btns = stampBtns(REACTS, rx, `data-act="react" data-id="${esc(c.id)}"`);
     const md = MOODS[c.mood] || MOODS.yunhi;
     const label = c.mood === "custom" ? (c.mood_label || "Kuch aur") : md[0];
     return `<article class="chit c-${md[1]}" style="--tilt:${tilt}deg">
@@ -944,27 +963,27 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     if (S.view === "collage") return cele + renderCollage();
     const list = byFilter(S.posts);
     const t = timelineOf(list, cardHTML, ["Aaj ki pehli photo aap daalo","Is waqt kya chal raha hai?","Kaam, khana, ya bas koi pal. Jab fursat mile, ek photo."]);
-    return cele + (t || `<p class="empty">${S.loading ? "Load ho raha hai…" : S.filter==="all" ? "Is din koi photo nahi daali gayi." : `${esc(mLabel(S.filter))} ne is din koi photo nahi daali.`}</p>`);
+    return cele + (t || emptyHTML(S.filter==="all" ? "Is din koi photo nahi daali gayi." : `${esc(mLabel(S.filter))} ne is din koi photo nahi daali.`));
   }
 
   function renderDil(){
     const list = byFilter(S.conf);
     const head = `<button type="button" class="sawaal" data-act="sawaal"><small>Aaj ka sawaal</small><strong>${esc(sawaalFor(S.day))}</strong><span>Mann ho toh jawab likho, warna bas padh lo.</span></button>`;
     const t = timelineOf(list, chitHTML, ["Aaj ki pehli dil ki baat aap likho","Kuch dil mein hai?","Yaadein, khushkhabri, shikayat, ya bas yunhi. Naam ke saath ya gupt."]);
-    return head + (t || `<p class="empty">${S.loading ? "Load ho raha hai…" : "Is din kisi ne kuch nahi likha."}</p>`);
+    return head + (t || emptyHTML("Is din kisi ne kuch nahi likha."));
   }
 
   function renderCollage(){
-    const all = [...S.members.filter(m => m.id === S.me), ...others()];
+    const all = meFirst();
     const ms = S.filter==="all" ? all : all.filter(m => m.id===S.filter);
-    if (!ms.length) return `<p class="empty">${S.loading ? "Load ho raha hai…" : "Parivaar tab se logon ko jodo."}</p>`;
+    if (!ms.length) return emptyHTML("Parivaar tab se logon ko jodo.");
     return `<div class="collage">${ms.map(m => {
       const ps = S.posts.filter(p => p.member === m.id);
       const title = m.id === S.me ? "Aapka din" : `${esc(mLabel(m.id))} ka din`;
       return `<section>
         <div class="cl-head">${dotHTML(m.id)}<h3>${title}</h3><span class="cnt">${ps.length} photo</span></div>
-        ${ps.length ? `<div class="grid">${ps.map(p => `<button type="button" class="tile" data-act="open" data-id="${esc(p.id)}" aria-label="${esc((TAGS[p.tag]||"Pal")+", "+tstr(p.ts))}">
-          ${img(p, (TAGS[p.tag]||"Pal")+", "+m.name)}<span class="ttime">${tstr(p.ts)} ${ap(new Date(p.ts).getHours())}</span><span class="tg bg-${esc(p.tag||"pal")}"></span></button>`).join("")}</div>`
+        ${ps.length ? `<div class="grid">${ps.map(p => `<button type="button" class="tile" data-act="open" data-id="${esc(p.id)}" aria-label="${esc(`${tagName(p)}, ${tstr(p.ts)}`)}">
+          ${img(p, `${tagName(p)}, ${m.name}`)}<span class="ttime">${tstr(p.ts)} ${ap(new Date(p.ts).getHours())}</span><span class="tg bg-${esc(p.tag||"pal")}"></span></button>`).join("")}</div>`
         : `<p class="cl-none">Abhi tak kuch nahi daala.</p>`}
       </section>`;
     }).join("")}</div>`;
@@ -1002,7 +1021,6 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
           <li><b>Install app</b> ya <b>Add to Home screen</b> chuno, phir <b>Install</b>.</li>
           <li>Ab app drawer ya home screen se Family Ka Din kholo.</li></ol>`}
       <button type="button" class="btn" data-close>Samajh gaya</button>`);
-    sheet.querySelector("[data-close]").onclick = closeSheet;
   }
 
   const REMIND = [["Band", null], ["Subah 9", 9], ["Dopahar 1", 13], ["Shaam 6", 18], ["Raat 9", 21]];
@@ -1045,13 +1063,13 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       <section class="sec">
         <h3>Mera parivaar</h3>
         <p>Har kisi ke aage apna rishta likho. Yeh sirf aapke phone pe aapko dikhega, baaki sab apna-apna rakhenge.</p>
-        ${joined.length ? `<div class="mrows">${joined.map(m => relRowHTML(m).replace('data-rel=', 'data-act="relpick" data-id=')).join("")}</div>` : `<p class="small">Abhi aur koi nahi juda. Upar se code bhejo.</p>`}
+        ${joined.length ? `<div class="mrows">${joined.map(relRowHTML).join("")}</div>` : `<p class="small">Abhi aur koi nahi juda. Upar se code bhejo.</p>`}
       </section>
 
       ${waiting.length ? `<section class="sec">
         <h3>Abhi juda nahi</h3>
         <p>Inhe aapne ya kisi aur ne pehle se joda hai. Jab yeh app kholenge, apna naam chun lenge.</p>
-        <div class="mrows">${waiting.map(m => relRowHTML(m).replace('data-rel=', 'data-act="relpick" data-id=')).join("")}</div>
+        <div class="mrows">${waiting.map(relRowHTML).join("")}</div>
       </section>` : ""}
 
       <section class="sec">
@@ -1065,7 +1083,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
         <button type="button" class="linkish" data-act="renamefam">Parivaar ka naam badlo</button>
         <button type="button" class="linkish" data-act="switchuser">Is phone pe koi aur hai? User badlo</button>
         <button type="button" class="linkish" data-act="leavefam">Doosre parivaar mein jao</button>
-        <button type="button" class="linkish" data-act="leaveself" style="color:var(--error)">Parivaar chhodo aur apna naam hatao</button>
+        <button type="button" class="linkish warn" data-act="leaveself">Parivaar chhodo aur apna naam hatao</button>
       </section>
     </div>`;
   }
@@ -1081,11 +1099,13 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       const k = "fkd-cele-" + S.day + "-" + S.fam.id;
       if (!ls.get(k)) { ls.set(k, "1"); celebrate(); }
     }
-    document.querySelectorAll("img[data-fail]").forEach(i => i.addEventListener("error", () => {
-      const d = document.createElement("div"); d.className = "imgfail"; d.textContent = "Photo nahi khul paayi";
-      i.replaceWith(d);
-    }, { once:true }));
   }
+
+  // Any photo that fails to load (timeline or open photo) is swapped for a short note.
+  document.addEventListener("error", e => {
+    const i = e.target; if (!(i instanceof HTMLImageElement) || !i.hasAttribute("data-fail")) return;
+    const d = document.createElement("div"); d.className = "imgfail"; d.textContent = "Photo nahi khul paayi"; i.replaceWith(d);
+  }, true);
 
   /* ================= sheets ================= */
   const scrim = $("#scrim"), sheet = $("#sheet");
@@ -1120,7 +1140,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     if (wasPhotos && m !== "photos") { try { history.pushState({ fkd:"tab" }, ""); } catch {} }
     else if (!wasPhotos && m === "photos" && hstate() === "tab") { ignorePop++; history.back(); }
   }
-  scrim.addEventListener("click", e => { if (e.target === scrim) { S.sheetPost = null; closeSheet(); return; } const t = e.target.closest("[data-vact]"); if (t) viewAction(t); });
+  scrim.addEventListener("click", e => { if (e.target === scrim || e.target.closest("[data-close]")) return closeSheet(); const t = e.target.closest("[data-vact]"); if (t) viewAction(t); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !scrim.hidden) closeSheet(); });
 
   function relSheet(id, after){
@@ -1137,8 +1157,8 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       <form class="row" id="cf"><input class="field" id="cl" maxlength="24" placeholder="Jaise: Chhutki, Jaan, Guruji" value="${esc(cur && !known.includes(cur) ? cur : "")}" aria-label="Apna rishta likho"><button class="btn" type="submit" style="flex:none">Rakho</button></form>
       <p class="err" id="rErr"></p>
       <div class="row">${cur?`<button type="button" class="btn warn" id="clr">Rishta hatao</button>`:""}<button type="button" class="btn" data-close>Band karo</button></div>
-      ${!m.claimed ? `<button type="button" class="linkish" id="rm" style="align-self:center">${esc(m.name)} ko list se hatao</button>`
-        : `<button type="button" class="linkish" id="rmc" style="align-self:center;color:var(--error)">${esc(m.name)} ko parivaar se hatao</button>`}`);
+      ${!m.claimed ? `<button type="button" class="linkish mid" id="rm">${esc(m.name)} ko list se hatao</button>`
+        : `<button type="button" class="linkish mid warn" id="rmc">${esc(m.name)} ko parivaar se hatao</button>`}`);
     const rmc = $("#rmc");
     if (rmc) rmc.onclick = () => confirmSheet(`${esc(m.name)} ko hatana hai?`, "Unki saari photos, comments aur doodles bhi hat jayenge, aur unki dil ki baatein Gupt ban jayengi. Yeh wapas nahi hoga.", "Haan, hatao", async () => {
       const { error } = await S.sb.from("members").delete().eq("id", id);
@@ -1152,10 +1172,9 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     sheet.querySelectorAll("[data-l]").forEach(b => b.onclick = () => save(b.dataset.l));
     $("#cf").onsubmit = e => { e.preventDefault(); const v = $("#cl").value.trim(); if (v) save(v); };
     const clr = $("#clr"); if (clr) clr.onclick = () => save(null);
-    sheet.querySelector("[data-close]").onclick = closeSheet;
     const rm = $("#rm");
-    if (rm) { let armed = false; rm.onclick = async () => {
-      if (!armed) { armed = true; rm.textContent = "Pakka hatana hai?"; return; }
+    if (rm) { rm.onclick = async () => {
+      if (!armed(rm)) return;
       const { error } = await S.sb.from("members").delete().eq("id", id).eq("claimed", false);
       if (error) { $("#rErr").textContent = "Hata nahi paaye."; return; }
       S.members = S.members.filter(x => x.id !== id); closeSheet(); after ? after() : render();
@@ -1165,23 +1184,18 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   function addMemberSheet(){
     openSheet(`<h2>Kisi ko parivaar mein jodo</h2>
       <p class="small">Unka naam pehle se jod do. Jab woh code se judenge, bas apna naam chun lenge. Chaho toh unhe seedha code bhej do.</p>
-      <form class="stack" id="af" style="display:flex;flex-direction:column;gap:12px">
+      <form class="stack" id="af">
         <input class="field" id="an" maxlength="30" placeholder="Naam, jaise: Rohit" aria-label="Naam">
-        <fieldset class="tags"><legend>Optional</legend>
-          <label><input type="radio" name="ag" value="m"><span>Ladka</span></label>
-          <label><input type="radio" name="ag" value="f"><span>Ladki</span></label>
-          <label><input type="radio" name="ag" value="" checked><span>Rehne do</span></label>
-        </fieldset>
+        ${genderPick("ag", "", "Optional")}
         <p class="err" id="aErr"></p>
-        <div class="row"><button type="button" class="btn" data-close>Rehne do</button><button type="submit" class="btn pri">Jodo, phir rishta chuno</button></div>
+        ${footRow(`<button type="submit" class="btn pri">Jodo, phir rishta chuno</button>`)}
       </form>`);
-    sheet.querySelector("[data-close]").onclick = closeSheet;
     $("#af").onsubmit = async e => {
       e.preventDefault();
       const name = $("#an").value.trim(); if (!name) return;
-      if (S.members.some(m => m.name.toLowerCase() === name.toLowerCase())) { $("#aErr").textContent = "Is naam se koi pehle se hai."; return; }
+      if (nameTaken(name)) { $("#aErr").textContent = "Is naam se koi pehle se hai."; return; }
       const gender = sheet.querySelector("input[name=ag]:checked")?.value || null;
-      const row = { id:uid(), family_id:S.fam.id, name, gender, color:COLORS[S.members.length % COLORS.length], claimed:false, added_by:S.me };
+      const row = newMember(name, gender, { claimed:false, added_by:S.me });
       const { error } = await S.sb.from("members").insert(row);
       if (error) { $("#aErr").textContent = "Nahi jud paaya. Dobara try karo."; return; }
       S.members.push(row); closeSheet(); render(); relSheet(row.id);
@@ -1191,19 +1205,14 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   function editMeSheet(){
     const me = meM();
     openSheet(`<h2>Aapki jaankari</h2>
-      <form id="ef" style="display:flex;flex-direction:column;gap:12px">
+      <form class="stack" id="ef">
         <input class="field" id="en" maxlength="30" value="${esc(me.name)}" aria-label="Aapka naam">
-        <fieldset class="tags"><legend>Rishte suggest karne ke liye</legend>
-          <label><input type="radio" name="eg" value="m" ${me.gender==="m"?"checked":""}><span>Ladka</span></label>
-          <label><input type="radio" name="eg" value="f" ${me.gender==="f"?"checked":""}><span>Ladki</span></label>
-          <label><input type="radio" name="eg" value="" ${!me.gender?"checked":""}><span>Rehne do</span></label>
-        </fieldset>
+        ${genderPick("eg", me.gender, "Rishte suggest karne ke liye")}
         <button type="button" class="btn" id="em">${me.mark ? "Nishaan dobara banao" : "Apna nishaan banao"}</button>
         <p class="err" id="eErr"></p>
-        <div class="row"><button type="button" class="btn" data-close>Rehne do</button><button type="submit" class="btn pri">Save karo</button></div>
+        ${footRow(`<button type="submit" class="btn pri">Save karo</button>`)}
       </form>`);
     $("#em").onclick = markSheet;
-    sheet.querySelector("[data-close]").onclick = closeSheet;
     $("#ef").onsubmit = async e => {
       e.preventDefault();
       const name = $("#en").value.trim(); if (!name) return;
@@ -1221,9 +1230,8 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       <div class="markpad" style="background:${esc(me.color)}"><svg id="mpad" viewBox="0 0 100 100" aria-label="Nishaan banane ki jagah"></svg></div>
       <div class="row"><button type="button" class="btn" id="mu">Undo</button><button type="button" class="btn" id="mc">Mita do</button></div>
       <p class="err" id="mErr"></p>
-      <div class="row"><button type="button" class="btn" data-close>Rehne do</button><button type="button" class="btn pri" id="ms" disabled>Save karo</button></div>
-      ${me.mark ? `<button type="button" class="linkish" id="mx" style="align-self:center">Nishaan hatao, initial dikhao</button>` : ""}`);
-    sheet.querySelector("[data-close]").onclick = closeSheet;
+      ${footRow(`<button type="button" class="btn pri" id="ms" disabled>Save karo</button>`)}
+      ${me.mark ? `<button type="button" class="linkish mid" id="mx">Nishaan hatao, initial dikhao</button>` : ""}`);
     const save = async mark => {
       const { error } = await S.sb.from("members").update({ mark }).eq("id", me.id);
       if (error) { $("#mErr").textContent = "Save nahi hua. Dobara try karo."; return; }
@@ -1240,12 +1248,11 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 
   function renameFamSheet(){
     openSheet(`<h2>Parivaar ka naam</h2>
-      <form id="rf" style="display:flex;flex-direction:column;gap:12px">
+      <form class="stack" id="rf">
         <input class="field" id="rn" maxlength="40" value="${esc(S.fam.name)}" aria-label="Parivaar ka naam">
         <p class="err" id="fErr"></p>
-        <div class="row"><button type="button" class="btn" data-close>Rehne do</button><button type="submit" class="btn pri">Save karo</button></div>
+        ${footRow(`<button type="submit" class="btn pri">Save karo</button>`)}
       </form>`);
-    sheet.querySelector("[data-close]").onclick = closeSheet;
     $("#rf").onsubmit = async e => {
       e.preventDefault();
       const name = $("#rn").value.trim(); if (!name) return;
@@ -1255,12 +1262,13 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     };
   }
 
+  const footRow = main => `<div class="row"><button type="button" class="btn" data-close>Rehne do</button>${main}</div>`;
   function confirmSheet(title, text, yes, onYes){
-    openSheet(`<h2>${title}</h2><p>${text}</p><div class="row"><button type="button" class="btn" data-close>Rehne do</button><button type="button" class="btn warn" id="yes">${yes}</button></div>`);
-    sheet.querySelector("[data-close]").onclick = closeSheet;
+    openSheet(`<h2>${title}</h2><p>${text}</p>${footRow(`<button type="button" class="btn warn" id="yes">${yes}</button>`)}`);
     $("#yes").onclick = () => { closeSheet(); onYes(); };
   }
 
+  function showToday(){ closeSheet(); S.day = todayKey(); S.filter = "all"; loadDay(); }
   function compress(file){
     return new Promise((res, rej) => {
       const url = URL.createObjectURL(file), im = new Image();
@@ -1270,7 +1278,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
         c.width = Math.round(im.naturalWidth*s); c.height = Math.round(im.naturalHeight*s);
         c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
         URL.revokeObjectURL(url);
-        c.toBlob(b => b ? res(b) : rej(new Error("blob")), "image/jpeg", 0.82);
+        c.toBlob(b => b ? res(b) : rej(new Error("decode")), "image/jpeg", 0.82);
       };
       im.onerror = () => { URL.revokeObjectURL(url); rej(new Error("decode")); };
       im.src = url;
@@ -1278,12 +1286,10 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   }
 
   function addPhotoSheet(){
-    const CAM = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>`;
-    const GAL = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 17l-5-5-9 8"/></svg>`;
     openSheet(`<h2>Naya pal</h2>
       <div class="pick" id="pick"><div class="src">
-        <label class="srcbtn main" for="cam">${CAM}Camera se kheencho</label>
-        <label class="srcbtn" for="gal">${GAL}Gallery se chuno</label></div></div>
+        <label class="srcbtn main" for="cam">${ICON.cam}Camera se kheencho</label>
+        <label class="srcbtn" for="gal">${ICON.gal}Gallery se chuno</label></div></div>
       <input type="file" id="cam" accept="image/*" capture="environment" hidden>
       <input type="file" id="gal" accept="image/*" hidden>
       <input class="field" id="cap" maxlength="120" placeholder="Photo pe kuch likho (optional)" aria-label="Caption">
@@ -1293,16 +1299,16 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
         <label class="t-pal"><input type="radio" name="tag" value="pal"><span>Pal</span></label>
       </fieldset>
       <p class="err" id="aErr"></p>
-      <div class="row"><button type="button" class="btn" data-close>Rehne do</button><button type="button" class="btn pri" id="post" disabled>Daal do</button></div>`);
+      ${footRow(`<button type="button" class="btn pri" id="post" disabled>Daal do</button>`)}`);
     let file = null;
-    sheet.querySelector("[data-close]").onclick = closeSheet;
     const capOv = () => $("#capOv");
     const onPick = e => {
       const f = e.target.files[0]; e.target.value = "";
       if (!f) return;
       file = f;
       $("#pick").innerHTML = `<span class="pw"><img src="${URL.createObjectURL(file)}" alt="Chuni hui photo"><span class="ov" id="capOv"></span></span>
-        <div class="src mini"><label class="srcbtn" for="cam">${CAM}Dobara kheencho</label><label class="srcbtn" for="gal">${GAL}Doosri chuno</label></div>`;
+        <div class="src mini"><label class="srcbtn" for="cam">${ICON.cam}Dobara kheencho</label><label class="srcbtn" for="gal">${ICON.gal}Doosri chuno</label></div>`;
+      const pv = $("#pick img"); pv.onload = pv.onerror = () => URL.revokeObjectURL(pv.src);
       capOv().textContent = $("#cap").value.trim();
       $("#post").disabled = false; $("#aErr").textContent = "";
     };
@@ -1315,19 +1321,21 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       const tag = sheet.querySelector("input[name=tag]:checked")?.value || "pal";
       const caption = $("#cap").value.trim().slice(0,120) || null;
       try {
-        let blob, type = "image/jpeg";
-        try { blob = await compress(file); } catch { blob = file; type = file.type || "image/jpeg"; }
+        // Always upload the shrunk JPEG (about 150 KB). A photo the phone can't open
+        // (some HEIC files) would not show for anyone: compress() rejects with "decode".
+        const blob = await compress(file);
         const day = todayKey();
         const path = `${S.fam.id}/${day}/${uid()}.jpg`;
-        const up = await S.sb.storage.from("photos").upload(path, blob, { contentType:type, upsert:false });
+        const up = await S.sb.storage.from("photos").upload(path, blob, { contentType:"image/jpeg", upsert:false });
         if (up.error) throw up.error;
         const ins = await S.sb.from("posts").insert({ family_id:S.fam.id, member:S.me, tag, caption, day, path });
         if (ins.error) throw ins.error;
-        closeSheet();
-        S.day = todayKey(); S.filter = "all"; loadDay();
+        showToday();
       } catch (err) {
-        const big = /size|large|413/i.test(String(err?.message || err?.statusCode || ""));
-        $("#aErr").textContent = big ? "Photo bahut badi hai. Koi chhoti photo chuno." : "Photo nahi daal paaye. Net check karke dobara try karo.";
+        const why = String(err?.message || err?.statusCode || "");
+        $("#aErr").textContent = why === "decode" ? "Yeh photo khul nahi paayi. Camera se kheencho, ya koi aur photo chuno."
+          : /size|large|413/i.test(why) ? "Photo 2 MB se badi hai. Koi aur photo chuno."
+          : "Photo nahi daal paaye. Net check karke dobara try karo.";
         btn.disabled = false; btn.textContent = "Daal do";
       }
     });
@@ -1349,7 +1357,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       <label class="toggle"><input type="checkbox" id="gupt"><span><b>Gupt rakho.</b> Naam kahin save nahi hoga, kisi ko pata nahi chalega kisne likha.</span></label>
       <p class="small" id="asWho"></p>
       <p class="err" id="dErr"></p>
-      <div class="row"><button type="button" class="btn" data-close>Rehne do</button><button type="button" class="btn pri" id="send" disabled>Chipka do</button></div>`);
+      ${footRow(`<button type="button" class="btn pri" id="send" disabled>Chipka do</button>`)}`);
     const body = $("#body"), send = $("#send");
     const drawStarters = () => { $("#starters").innerHTML = (STARTERS[mood] || []).map(s => `<button type="button" data-s="${esc(s)}">${esc(s.trim())}</button>`).join(""); };
     const check = () => { send.disabled = !body.value.trim(); $("#count").textContent = `${body.value.length} / 400`; };
@@ -1367,7 +1375,6 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     });
     body.addEventListener("input", check);
     $("#gupt").addEventListener("change", drawWho);
-    sheet.querySelector("[data-close]").onclick = closeSheet;
     send.addEventListener("click", async () => {
       const text = body.value.trim().slice(0, 400); if (!text) return;
       const gupt = $("#gupt").checked;
@@ -1377,8 +1384,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       const { error } = await S.sb.from("confessions").insert({ id, family_id:S.fam.id, member: gupt ? null : S.me, mood, mood_label, body:text, prompt, day: todayKey() });
       if (error) { $("#dErr").textContent = "Nahi chipka paaye. Net check karke dobara try karo."; send.disabled = false; send.textContent = "Chipka do"; return; }
       mine.add(id);
-      closeSheet();
-      S.day = todayKey(); S.filter = "all"; loadDay();
+      showToday();
     });
   }
 
@@ -1397,23 +1403,21 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     const dds = S.doodles.filter(d => d.post_id === p.id);
     const myDd = dds.filter(d => d.member === S.me);
     // Layout follows an 8-pt scale and the proximity rule: 8–12px inside a group, 24px between groups.
-    const PEN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg>`;
     box.innerHTML = `
       <section class="vg">
-        <div class="big">${photoHTML(p, (TAGS[p.tag]||"Pal")+", "+mName(p.member))}</div>
-        <div class="meta" style="padding:0">${whoHTML(p.member)}<span class="tag t-${esc(p.tag||"pal")}">${esc(TAGS[p.tag]||"Pal")}</span><time>${tstr(p.ts)} ${ap(h)}, ${tod(h)}</time></div>
+        <div class="big">${photoHTML(p, `${tagName(p)}, ${mName(p.member)}`)}</div>
+        <div class="meta" style="padding:0">${whoHTML(p.member)}${tagPill(p)}<time>${tstr(p.ts)} ${ap(h)}, ${tod(h)}</time></div>
       </section>
       <section class="vg tight">
         <h3 class="vlbl">Stamp lagao</h3>
-        <div class="stamps">${PHOTO_STAMPS.map(([k, l]) => { const n = rx.filter(r => r.kind === k).length; const on = rx.some(r => r.kind === k && r.member === S.me);
-          return `<button type="button" class="stamp" data-vact="stamp" data-k="${k}" data-id="${esc(p.id)}" aria-pressed="${on}"><span>${l}${n?`<b>${n}</b>`:""}</span></button>`; }).join("")}</div>
-        ${rx.length ? `<p class="small">${[...new Set(rx.map(r => r.member))].map(m => esc(mLabel(m))).join(", ")} ne stamp lagaya</p>` : ""}
+        <div class="stamps">${stampBtns(PHOTO_STAMPS, rx, `data-vact="stamp" data-id="${esc(p.id)}"`)}</div>
+        ${rx.length ? `<p class="small">${namesOf(rx)} ne stamp lagaya</p>` : ""}
       </section>
       <section class="vg tight">
-        <button type="button" class="tool" data-vact="doodle">${PEN}Photo pe kuch banao</button>
-        ${dds.length ? `<p class="small ddlist"><span>${dds.length} doodle: ${[...new Set(dds.map(d => d.member))].map(m => esc(mLabel(m))).join(", ")}</span>
+        <button type="button" class="tool" data-vact="doodle">${ICON.pen}Photo pe kuch banao</button>
+        ${dds.length ? `<p class="small ddlist"><span>${dds.length} doodle: ${namesOf(dds)}</span>
           <button type="button" class="linkish" data-vact="hidedd">${S.hideDoodles ? "Doodle dikhao" : "Doodle chhupao"}</button>
-          ${myDd.length ? `<button type="button" class="linkish" data-vact="deldd" style="color:var(--error)">Mera doodle hatao</button>` : ""}</p>` : ""}
+          ${myDd.length ? `<button type="button" class="linkish warn" data-vact="deldd">Mera doodle hatao</button>` : ""}</p>` : ""}
       </section>
       <hr class="sep">
       <section class="vg">
@@ -1424,7 +1428,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
         <p class="err" id="vErr"></p>
       </section>
       <section class="vg foot">
-        <button type="button" class="btn" data-vact="close">Band karo</button>
+        <button type="button" class="btn" data-close>Band karo</button>
         ${p.member === S.me ? `<button type="button" class="dangerlink" data-vact="delpost">Yeh photo hatao</button>` : ""}
       </section>`;
     $("#ci").value = keep;
@@ -1441,16 +1445,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   }
   async function viewAction(t){
     const a = t.dataset.vact, p = S.posts.find(x => x.id === S.sheetPost); if (!p) return;
-    if (a === "close") { S.sheetPost = null; closeSheet(); }
-    else if (a === "stamp") {
-      const k = t.dataset.k, has = S.preacts.find(r => r.post_id === p.id && r.kind === k && r.member === S.me);
-      S.preacts = has ? S.preacts.filter(r => r !== has) : [...S.preacts, { post_id:p.id, member:S.me, kind:k }];
-      refreshView(); render();
-      const { error } = has
-        ? await S.sb.from("photo_reactions").delete().eq("post_id", p.id).eq("member", S.me).eq("kind", k)
-        : await S.sb.from("photo_reactions").insert({ family_id:S.fam.id, post_id:p.id, member:S.me, kind:k });
-      if (error && !/duplicate|23505/i.test(String(error.message || error.code))) loadDay(true);
-    }
+    if (a === "stamp") toggleReaction("photo_reactions", "post_id", "preacts", p.id, t.dataset.k, () => { refreshView(); render(); });
     else if (a === "hidedd") { S.hideDoodles = !S.hideDoodles; refreshView(); }
     else if (a === "deldd") {
       const mineIds = S.doodles.filter(d => d.post_id === p.id && d.member === S.me).map(d => d.id);
@@ -1462,10 +1457,10 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       await S.sb.from("comments").delete().eq("id", id);
     }
     else if (a === "delpost") {
-      if (t.dataset.armed !== "1") { t.dataset.armed = "1"; t.textContent = "Pakka hatana hai?"; return; }
+      if (!armed(t)) return;
       const { error } = await S.sb.from("posts").delete().eq("id", p.id);
       if (error) { $("#vErr").textContent = "Hata nahi paaye. Dobara try karo."; return; }
-      S.sheetPost = null; closeSheet(); loadDay(true);
+      closeSheet(); loadDay(true);
     }
     else if (a === "doodle") doodleMode(p);
   }
@@ -1509,10 +1504,8 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       await S.sb.from("members").update({ remind_at:null }).eq("id", me.id);
       me.remind_at = null; note("Reminder band. Jab chaho phir chalu kar lena."); render(); return;
     }
-    const ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
-    const standalone = navigator.standalone || matchMedia("(display-mode: standalone)").matches;
     if (!cfg.vapidPublicKey) return note("Reminders abhi set up nahi hue. Shiv se kaho README ka reminder wala step kar de.");
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return note(ios && !standalone ? "iPhone pe pehle Share > Add to Home Screen karo, phir wahan se app kholke yeh chuno." : "Is browser mein reminder nahi chal sakte. Chrome mein kholke try karo.");
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return note(isIOS() && !isStandalone() ? "iPhone pe pehle Share > Add to Home Screen karo, phir wahan se app kholke yeh chuno." : "Is browser mein reminder nahi chal sakte. Chrome mein kholke try karo.");
     try {
       const perm = await Notification.requestPermission();
       if (perm !== "granted") return note("Notification ki permission nahi mili. Phone ki settings mein is site ko allow karo.");
@@ -1520,45 +1513,46 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       const key = Uint8Array.from(atob(cfg.vapidPublicKey.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((cfg.vapidPublicKey.length + 3) % 4)), c => c.charCodeAt(0));
       const sub = (await reg.pushManager.getSubscription()) || (await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:key }));
       const j = sub.toJSON();
-      const a = await S.sb.from("push_subs").upsert({ endpoint:j.endpoint, family_id:S.fam.id, member:me.id, p256dh:j.keys.p256dh, auth:j.keys.auth }, { onConflict:"endpoint" });
-      const b = await S.sb.from("members").update({ remind_at:h }).eq("id", me.id);
+      const [a, b] = await Promise.all([S.sb.from("push_subs").upsert({ endpoint:j.endpoint, family_id:S.fam.id, member:me.id, p256dh:j.keys.p256dh, auth:j.keys.auth }, { onConflict:"endpoint" }),
+        S.sb.from("members").update({ remind_at:h }).eq("id", me.id)]);
       if (a.error || b.error) return note("Save nahi hua. Dobara try karo.");
       me.remind_at = h; note(`Ho gaya! Roz ${REMIND.find(r => r[1] === h)[0].toLowerCase()} baje yaad dilayenge, agar tab tak kuch nahi daala.`); render();
     } catch { note("Reminder chalu nahi ho paaya. Thodi der baad dobara try karo."); }
   }
 
-  async function toggleReact(cid, kind){
-    const has = S.reacts.find(r => r.confession_id === cid && r.kind === kind && r.member === S.me);
-    const before = S.reacts;
-    S.reacts = has ? S.reacts.filter(r => r !== has) : [...S.reacts, { confession_id:cid, member:S.me, kind }];
-    render();
+  // Flip my stamp at once, then save. Duplicates are ignored by the database (upsert), errors undo the flip.
+  async function toggleReaction(table, fk, list, id, kind, redraw){
+    const before = S[list], has = before.find(r => r[fk] === id && r.kind === kind && r.member === S.me);
+    S[list] = has ? before.filter(r => r !== has) : [...before, { [fk]:id, member:S.me, kind }];
+    redraw();
+    const q = S.sb.from(table);
     const { error } = has
-      ? await S.sb.from("reactions").delete().eq("confession_id", cid).eq("member", S.me).eq("kind", kind)
-      : await S.sb.from("reactions").insert({ family_id:S.fam.id, confession_id:cid, member:S.me, kind });
-    if (error && !/duplicate|23505/i.test(String(error.message || error.code))) { S.reacts = before; render(); }
+      ? await q.delete().eq(fk, id).eq("member", S.me).eq("kind", kind)
+      : await q.upsert({ family_id:S.fam.id, [fk]:id, member:S.me, kind }, { onConflict:`${fk},member,kind`, ignoreDuplicates:true });
+    if (error) { S[list] = before; redraw(); }
   }
 
-  let armedChit = null;
   async function deleteChit(btn){
     const id = btn.dataset.id;
-    if (armedChit !== id) { armedChit = id; btn.textContent = "Pakka hatana hai?"; btn.classList.add("armed"); return; }
-    armedChit = null; btn.disabled = true;
+    if (!armed(btn)) return;
+    btn.disabled = true;
     const { error } = await S.sb.from("confessions").delete().eq("id", id);
     if (error) { btn.disabled = false; btn.textContent = "Hata nahi paaye"; return; }
     S.conf = S.conf.filter(c => c.id !== id); render();
   }
 
+  // Tap-twice delete: the first tap only arms the button. A redraw disarms it.
+  function armed(b){ if (b.dataset.armed) return true; b.dataset.armed = "1"; b.textContent = "Pakka hatana hai?"; b.classList.add("armed"); return false; }
   async function copyLink(btn){
     const link = inviteLink();
     try { await navigator.clipboard.writeText(link); btn.textContent = "Copy ho gaya"; }
-    catch { openSheet(`<h2>Yeh link bhejo</h2><input class="field" value="${esc(link)}" readonly aria-label="Invite link"><button type="button" class="btn" data-close>Band karo</button>`); sheet.querySelector("[data-close]").onclick = closeSheet; sheet.querySelector("input").select(); }
+    catch { openSheet(`<h2>Yeh link bhejo</h2><input class="field" value="${esc(link)}" readonly aria-label="Invite link"><button type="button" class="btn" data-close>Band karo</button>`); sheet.querySelector("input").select(); }
   }
 
   /* ================= events ================= */
   document.addEventListener("click", e => {
     const t = e.target.closest("[data-act]"); if (!t || sheet.contains(t) || !S.sb || $("#app").hidden) return;
     const a = t.dataset.act;
-    if (a !== "delchit" && armedChit) armedChit = null;
     if (a === "prev") { S.day = shiftDay(S.day, -1); loadDay(); }
     else if (a === "next") { if (S.day !== todayKey()) { S.day = shiftDay(S.day, 1); loadDay(); } }
     else if (a === "mode") goMode(t.dataset.m);
@@ -1567,7 +1561,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     else if (a === "add") S.mode === "parivaar" ? addMemberSheet() : S.mode === "dil" ? dilSheet(false) : addPhotoSheet();
     else if (a === "sawaal") dilSheet(true);
     else if (a === "open") viewSheet(t.dataset.id);
-    else if (a === "react") toggleReact(t.dataset.id, t.dataset.k);
+    else if (a === "react") toggleReaction("reactions", "confession_id", "reacts", t.dataset.id, t.dataset.k, render);
     else if (a === "delchit") deleteChit(t);
     else if (a === "relpick") relSheet(t.dataset.id);
     else if (a === "acceptrel") setRelation(t.dataset.id, t.dataset.l).then(render);
@@ -1579,12 +1573,12 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     else if (a === "leaveself") confirmSheet("Parivaar chhodna hai?", "Aapka naam, photos, comments aur doodles hat jayenge, aur aapki dil ki baatein Gupt ban jayengi. Yeh wapas nahi hoga.", "Haan, chhodo", async () => {
       const { error } = await S.sb.from("members").delete().eq("id", S.me);
       if (error) return;
-      ls.del("fkd-me"); ls.del("fkd-code"); location.href = location.pathname;
+      forgetDevice();
     });
     else if (a === "renamefam") renameFamSheet();
     else if (a === "copylink") copyLink(t);
     else if (a === "switchuser") confirmSheet("User badlo?", "Is phone se aap log out ho jaoge. Aapki photos aur baatein waise hi rahengi.", "Haan, badlo", () => { ls.del("fkd-me"); S.me = null; S.rel = {}; S.relIn = []; onbWho(false); });
-    else if (a === "leavefam") confirmSheet("Doosre parivaar mein jao?", `Is phone se ${esc(S.fam.name)} hat jayega. Wapas aane ke liye code chahiye hoga: <b>${esc(S.fam.code)}</b>`, "Haan, jao", () => { ls.del("fkd-me"); ls.del("fkd-code"); location.href = location.pathname; });
+    else if (a === "leavefam") confirmSheet("Doosre parivaar mein jao?", `Is phone se ${esc(S.fam.name)} hat jayega. Wapas aane ke liye code chahiye hoga: <b>${esc(S.fam.code)}</b>`, "Haan, jao", () => { forgetDevice(); });
   });
 
   if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
