@@ -154,10 +154,8 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;
 .fam{display:flex;flex-direction:column;gap:18px;margin-top:12px}
 .invite{background:var(--primary);color:var(--on-primary);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
 .invite small{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
-.invite .code{font-family:var(--display);font-size:40px;letter-spacing:.14em;line-height:1}
 .invite p{margin:0;font-size:15px;opacity:.9}
-.invite .row a,.invite .row button{flex:1;text-align:center;text-decoration:none;border-radius:12px;padding:10px;font-weight:700;border:1.5px solid currentColor;background:transparent;color:inherit}
-.invite .row a.wa{background:var(--on-primary);color:var(--primary);border-color:var(--on-primary)}
+.invite .row button{flex:1;text-align:center;border-radius:12px;padding:10px;font-weight:700;border:1.5px solid currentColor;background:transparent;color:inherit}
 .sec h3{margin:0 0 4px;font-size:19px}
 .sec > p{margin:0 0 10px;color:var(--muted);font-size:15px}
 .mrows{display:flex;flex-direction:column;background:var(--surface);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
@@ -169,6 +167,9 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;
 .mrow .info span{font-size:14px;color:var(--muted)}
 .mrow .info span b{color:var(--ink);font-weight:600}
 .chev{color:var(--muted);font-size:20px}
+.mrow .acts{display:flex;gap:8px;align-items:center;flex:none}
+.mrow .acts .btn{flex:none;padding:6px 14px}
+#mFam.ask::after{content:"";display:inline-block;width:8px;height:8px;margin-left:6px;border-radius:50%;background:var(--error);vertical-align:middle}
 .sugg{background:var(--sunk);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
 .sugg p{margin:0;font-size:16px}
 .sugg .row .btn{padding:8px}
@@ -223,6 +224,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 .toggle{display:flex;gap:10px;align-items:flex-start;font-size:16px}
 .toggle input{width:20px;height:20px;margin-top:3px;accent-color:var(--primary);flex:none}
 .row{display:flex;gap:10px}
+a.btn{text-decoration:none;text-align:center}
 .btn{flex:1;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:12px;font-weight:600}
 .btn.pri{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
 .btn.go{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
@@ -253,7 +255,6 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 .steps{display:flex;gap:6px}
 .steps i{flex:1;height:4px;border-radius:2px;background:var(--line)}
 .steps i.on{background:var(--primary)}
-.code-in{font-family:var(--display);font-size:30px;letter-spacing:.18em;text-transform:uppercase;text-align:center}
 /* hand-drawn stamps (rough.js draws the ink ring) */
 /* Quiet pills by default; the hand-drawn ink ring appears only on the stamps YOU put on, so it means something. */
 .stamps{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -396,6 +397,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   const todayKey = () => dayKey(new Date());
   const parseDay = k => { const [y,m,d] = k.split("-").map(Number); return new Date(y, m-1, d); };
   const shiftDay = (k, n) => { const d = parseDay(k); d.setDate(d.getDate()+n); return dayKey(d); };
+  const relDay = k => k === todayKey() ? "Aaj" : k === shiftDay(todayKey(), -1) ? "Kal" : null;
   const VAAR = ["Ravivar","Somvar","Mangalvar","Budhvar","Guruvar","Shukravar","Shanivar"];
   const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const TAGS = { kaam:"Kaam", khana:"Khana", pal:"Pal" };
@@ -410,14 +412,19 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     set(k,v){ try { localStorage.setItem(k,v); } catch {} },
     del(k){ try { localStorage.removeItem(k); } catch {} }
   };
-  const forgetDevice = () => { ls.del("fkd-me"); ls.del("fkd-code"); location.href = location.pathname; };
-  // Ids of notes written on this phone (so a Gupt note can be deleted from here). Read once.
-  const mine = {
-    ids: null,
-    load(){ if (!this.ids) { try { this.ids = JSON.parse(ls.get("fkd-mine") || "[]"); } catch { this.ids = []; } } return this.ids; },
-    add(id){ this.ids = [...this.load(), id].slice(-500); ls.set("fkd-mine", JSON.stringify(this.ids)); },
-    has(id){ return this.load().includes(id); }
+  // This phone has left (or was removed from) its family: forget what it kept and start over.
+  const OLD_KEYS = ["fkd-code", "fkd-me", "fkd-mine"];   // what the app kept before logins
+  const forgetDevice = () => { [...OLD_KEYS, "fkd-in", "fkd-gupt"].forEach(k => ls.del(k)); location.href = location.pathname; };
+  // Keys of Gupt notes written on this phone: the database keeps only a hash, so only
+  // this phone can delete them (delete_gupt). Read once.
+  const guptKeys = {
+    keys: null,
+    all(){ if (!this.keys) { try { this.keys = JSON.parse(ls.get("fkd-gupt") || "{}"); } catch { this.keys = {}; } } return this.keys; },
+    add(id, key){ this.all()[id] = key; ls.set("fkd-gupt", JSON.stringify(this.keys)); },
+    key(id){ return this.all()[id]; }
   };
+  const sha256 = async t => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)))]
+    .map(b => b.toString(16).padStart(2, "0")).join("");
 
   /* ================= content ================= */
   const MOODS = {
@@ -480,12 +487,11 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 
   const genderPick = (name, cur, legend) => `<fieldset class="tags"><legend>${legend}</legend>${[["m","Ladka"],["f","Ladki"],["","Rehne do"]]
     .map(([v, l]) => `<label><input type="radio" name="${name}" value="${v}" ${(cur || "") === v ? "checked" : ""}><span>${l}</span></label>`).join("")}</fieldset>`;
-  const COLORS = ["#A35A00","#064F6E","#6E5F10","#1F6F93","#7A4A00","#4A4010"];
 
   /* ================= state ================= */
   const cfg = window.FAMILY_CONFIG || {};
   const S = {
-    sb:null, fam:null, members:[], rel:{}, relIn:[], me: ls.get("fkd-me"),
+    sb:null, uid:null, fam:null, members:[], rel:{}, relIn:[], me:null, devices:[], invites:[],
     mode: ["dil","parivaar"].includes(ls.get("fkd-mode")) ? ls.get("fkd-mode") : "photos",
     day: todayKey(), posts:[], conf:[], reacts:[], preacts:[], comments:[], doodles:[], view:"timeline", filter:"all",
     loading:true, offline:false, reqId:0, started:false
@@ -500,8 +506,8 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   const others = () => S.members.filter(m => m.id !== S.me);
   const meFirst = () => [meM(), ...others()].filter(Boolean);
   const namesOf = rows => [...new Set(rows.map(r => r.member))].map(m => esc(mLabel(m))).join(", ");
-  const nameTaken = name => S.members.some(m => m.name.toLowerCase() === name.toLowerCase());
-  const newMember = (name, gender, extra) => Object.assign({ id:uid(), family_id:S.fam.id, name, gender, color:COLORS[S.members.length % COLORS.length] }, extra);
+  const nameTaken = (name, list = S.members) => list.some(m => m.name.toLowerCase() === name.toLowerCase());
+  const isAdmin = () => !!meM()?.is_admin;
   const photoUrl = path => S.sb.storage.from("photos").getPublicUrl(path).data.publicUrl;
   // Untrusted drawing data from the database: only allow plain path syntax.
   const okPath = d => typeof d === "string" && d.length < 20000 && /^[MQTLCZmqtlcz0-9 ,.\-]+$/.test(d);
@@ -591,17 +597,41 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   }
 
   /* ================= backend ================= */
-  function client(code){
-    return window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey, {
-      global: { headers: { "x-family-code": code || "" } },
-      auth: { persistSession:false, autoRefreshToken:false }
-    });
+  // Each phone has its own (anonymous) login, kept in localStorage by supabase-js.
+  const devLabel = () => /iPhone|iPad/.test(navigator.userAgent) ? "iPhone" : /Android/.test(navigator.userAgent) ? "Android phone" : "Computer";
+  const must = ({ data, error }) => { if (error) throw error; return data; };
+  const rpc = (fn, args) => S.sb.rpc(fn, args).then(must);
+  const NET = "Nahi ho paaya. Net check karke dobara try karo.";
+  const NAME_TAKEN = "Is naam se koi pehle se hai. Thoda alag likho, jaise surname ke saath.";
+  const ONE_ADMIN = "Parivaar mein kam se kam ek admin chahiye. Pehle kisi aur ko admin banao: unke naam pe tap karo.";
+  // The database functions raise short keys (phase1-login.sql); this says them in Hinglish.
+  const errText = (e, fallback = NET) =>
+    ({ last_admin:ONE_ADMIN, name_taken:NAME_TAKEN, not_admin:"Yeh sirf parivaar ke admin kar sakte hain." })[e?.message] || fallback;
+  const waLink = text => "https://wa.me/?text=" + encodeURIComponent(text);
+  // Take a phone out of the family: this one (log out, withdraw a request) or, for an admin, any.
+  const dropDevice = id => S.sb.from("devices").delete().eq("user_id", id).then(must);
+  // Still in the family? null from whoami means an admin removed this phone. A network
+  // error counts as "still in": the next check will tell. Also marks the phone as seen.
+  async function stillIn(){
+    if ((await rpc("whoami").catch(() => "offline")) !== null) return true;
+    onbGone(); return false;
   }
-  async function familyFor(code){
-    const sb = client(code);
-    const { data, error } = await sb.rpc("family_info");
-    if (error) throw error;
-    return data ? { sb, fam:data } : null;
+  async function signIn(){
+    if (!S.uid) {
+      const { data, error } = await S.sb.auth.signInAnonymously();
+      if (error) throw error;
+      S.uid = data.user.id;
+    }
+  }
+  // Phones (admins: the whole family's; others: their own) and open invite links.
+  async function loadAdmin(){
+    const [d, i] = await Promise.all([
+      S.sb.from("devices").select("user_id, member_id, want_name, label, last_seen, approved_at").order("created_at"),
+      S.sb.from("invites").select("id, created_by, expires_at").is("used_at", null).is("revoked_at", null)
+        .gt("expires_at", new Date().toISOString()).order("created_at")
+    ]);
+    if (!d.error) S.devices = d.data || [];
+    if (!i.error) S.invites = i.data || [];
   }
   async function loadMembers(){
     const { data, error } = await S.sb.from("members").select("*").order("created_at");
@@ -658,19 +688,31 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   }
   const stepBar = n => `<div class="steps" aria-hidden="true">${[1,2,3].map(i => `<i class="${i<=n?"on":""}"></i>`).join("")}</div>`;
 
-  function onbWelcome(){
+  // note: why we are here instead of in the app (dead link, phone removed…), already safe HTML.
+  function onbWelcome(note){
     showOnb(`
       <div class="hours" aria-hidden="true">${[3,5,2,6,4,7,3,5,6,2,4,5].map((h,i) => `<i class="${i===9?"acc":i%3===0?"on":""}" style="height:${h*9}px"></i>`).join("")}</div>
       <h1 class="hero">Family Ka Din</h1>
       <p class="lead">Ghar ke sab log, din bhar ke chhote pal. Ek photo, ek baat, jab fursat mile.</p>
-      <div class="stack">
-        <button type="button" class="btn go" id="goCreate">Naya parivaar banao</button>
-        <button type="button" class="btn" id="goJoin">Code se parivaar mein judo</button>
-      </div>
-      <p class="small">Kisi ne link bheja hai? Usi link ko kholo, code apne aap aa jayega.</p>`);
+      ${note ? `<p class="err">${note}</p>` : ""}
+      <button type="button" class="btn go" id="goCreate">Naya parivaar banao</button>
+      <p class="small">Parivaar mein judna hai? Jo pehle se app pe hain, unse invite link maango aur usi link ko kholo.</p>`);
     $("#goCreate").onclick = onbCreate;
-    $("#goJoin").onclick = () => onbJoin("");
   }
+  const DEAD_LINK = "Yeh invite link ab kaam nahi karta: 48 ghante purana hai, pehle use ho chuka hai, ya cancel ho gaya. Jisne bheja, unse naya link maango.";
+  function offlineScreen(retry){
+    showOnb(`<h1 class="hero">Family Ka Din</h1><p class="lead">Net nahi mil raha.</p><button type="button" class="btn go" id="retry">Dobara try karo</button>`);
+    $("#retry").onclick = retry;
+  }
+  // Inside the family (approved). fresh: just joined, so offer the relation step first.
+  async function enter(who, fresh){
+    S.fam = who.family; S.me = who.member;
+    ls.set("fkd-in", "1");
+    try { navigator.storage?.persist?.(); } catch {}  // ask Chrome not to clear the login under storage pressure
+    await Promise.all([loadMembers(), loadRelations(), loadAdmin()]);
+    if (fresh && others().length) onbRishte(); else startApp(fresh ? "parivaar" : undefined);
+  }
+  function onbGone(){ ls.del("fkd-in"); onbWelcome("Yeh phone ab parivaar mein nahi hai. Wapas judne ke liye kisi se naya invite link maango."); }
 
   function onbCreate(){
     showOnb(`
@@ -683,58 +725,43 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
         <button class="btn go" type="submit">Aage badho</button>
         <p class="err" id="err"></p>
       </form>`);
-    $("#back").onclick = onbWelcome;
-    $("#f").onsubmit = async e => {
+    $("#back").onclick = () => onbWelcome();
+    $("#f").onsubmit = e => {
       e.preventDefault();
-      const name = $("#fname").value.trim(); if (!name) { $("#err").textContent = "Parivaar ka naam likho."; return; }
-      $("#err").textContent = "Bana rahe hain…";
-      try {
-        const { data, error } = await client("").rpc("create_family", { fname:name });
-        if (error || !data) throw error;
-        ls.set("fkd-code", data.code); ls.del("fkd-me"); S.me = null;
-        S.sb = client(data.code); S.fam = data; S.members = [];
-        onbWho(true);
-      } catch { $("#err").textContent = "Parivaar nahi ban paaya. Net check karke dobara try karo."; }
+      const fname = $("#fname").value.trim(); if (!fname) { $("#err").textContent = "Parivaar ka naam likho."; return; }
+      onbWho("Aur aap kaun ho?", [], async (id, name, gender) => {
+        await signIn();
+        enter(await rpc("create_family", { fname, my_name:name, my_gender:gender, device_label:devLabel() }), true);
+      });
     };
   }
 
-  function onbJoin(prefill){
-    showOnb(`
-      <button type="button" class="back" id="back">‹ Wapas</button>
-      ${stepBar(1)}
-      <h2>Parivaar ka code daalo</h2>
-      <p>Yeh 6 akshar ka code parivaar mein kisi ke paas hoga. Parivaar tab mein dikhta hai.</p>
-      <form class="stack" id="f">
-        <input class="field code-in" id="code" maxlength="12" value="${esc(prefill)}" placeholder="K7MPQ2" aria-label="Parivaar ka code" autocomplete="off" autocapitalize="characters">
-        <button class="btn go" type="submit">Judo</button>
-        <p class="err" id="err"></p>
-      </form>`);
-    $("#back").onclick = onbWelcome;
-    $("#f").onsubmit = async e => {
-      e.preventDefault();
-      const code = $("#code").value.trim().toUpperCase(); if (!code) return;
-      $("#err").textContent = "Dhoondh rahe hain…";
-      try {
-        const r = await familyFor(code);
-        if (!r) { $("#err").textContent = "Is code ka koi parivaar nahi mila. Ek baar phir check karo."; return; }
-        ls.set("fkd-code", code); ls.del("fkd-me"); S.me = null;
-        S.sb = r.sb; S.fam = r.fam;
-        await loadMembers();
-        onbWho(false);
-      } catch { $("#err").textContent = "Net nahi mil raha. Thodi der mein dobara try karo."; }
-    };
+  // Opened an invite link: check it, then pick your name and ask an admin to let this phone in.
+  async function onbInvite(token){
+    showOnb(`<h1 class="hero">Family Ka Din</h1><p class="lead">Invite khol rahe hain…</p>`);
+    try {
+      await signIn();
+      const info = await rpc("invite_info", { token });
+      if (!info) return onbWelcome(DEAD_LINK);
+      onbWho(`${esc(info.family)} mein swagat hai`, info.members, async (id, name, gender) => {
+        const who = await rpc("ask_to_join", { token, want_member:id, new_name:name, new_gender:gender, device_label:devLabel() });
+        who ? onbWaiting(who) : onbWelcome(DEAD_LINK);
+      });
+    } catch { offlineScreen(() => onbInvite(token)); }
   }
 
-  function onbWho(isCreator){
-    const unclaimed = S.members.filter(m => !m.claimed);
-    const claimed = S.members.filter(m => m.claimed);
+  // Who is this phone? Pick a name someone already added, an existing name (new phone),
+  // or register a new one. submit(memberId | null, name, gender) does the joining.
+  function onbWho(head, list, submit){
+    const unclaimed = list.filter(m => !m.claimed), claimed = list.filter(m => m.claimed);
+    const chips = (rows, extra) => `<div class="chips"${extra || ""}>${rows.map(m => `<button type="button" data-id="${esc(m.id)}">${esc(m.name)}</button>`).join("")}</div>`;
     showOnb(`
       ${stepBar(2)}
-      <h2>${isCreator ? "Aur aap kaun ho?" : `${esc(S.fam.name)} mein swagat hai`}</h2>
+      <h2>${head}</h2>
       ${unclaimed.length ? `
         <div class="stack">
           <p class="lead">Kisi ne aapko pehle se joda hai? Apna naam chuno:</p>
-          <div class="chips" id="unc">${unclaimed.map(m => `<button type="button" data-id="${esc(m.id)}">${esc(m.name)}</button>`).join("")}</div>
+          ${chips(unclaimed)}
         </div>
         <p class="small">Aapka naam nahi hai? Neeche register karo.</p>` : `<p class="lead">Apna naam batao. Parivaar mein sab isi naam se dekhenge.</p>`}
       <form class="stack" id="f">
@@ -745,30 +772,39 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
         <p class="err" id="err"></p>
       </form>
       ${claimed.length ? `<details><summary class="small">Pehle se registered ho, bas naya phone hai?</summary>
-        <div class="chips" id="cl" style="margin-top:10px">${claimed.map(m => `<button type="button" data-id="${esc(m.id)}">${esc(m.name)}</button>`).join("")}</div></details>` : ""}`);
-    const unc = $("#unc");
-    if (unc) unc.onclick = async e => {
-      const b = e.target.closest("[data-id]"); if (!b) return;
-      const { error } = await S.sb.from("members").update({ claimed:true }).eq("id", b.dataset.id);
-      if (error) { $("#err").textContent = "Nahi ho paaya. Dobara try karo."; return; }
-      S.me = b.dataset.id; ls.set("fkd-me", S.me); await loadMembers(); await loadRelations(); onbRishte();
+        ${chips(claimed, ' style="margin-top:10px"')}</details>` : ""}`);
+    const go = async (id, name, gender) => {
+      $("#err").textContent = "Bhej rahe hain…";
+      try { await submit(id, name, gender); }
+      catch (e) { $("#err").textContent = errText(e); }
     };
-    const cl = $("#cl");
-    if (cl) cl.onclick = async e => {
-      const b = e.target.closest("[data-id]"); if (!b) return;
-      S.me = b.dataset.id; ls.set("fkd-me", S.me); await loadRelations(); startApp();
-    };
-    $("#f").onsubmit = async e => {
+    onb.querySelectorAll(".chips [data-id]").forEach(b => b.onclick = () => go(b.dataset.id, null, null));
+    $("#f").onsubmit = e => {
       e.preventDefault();
       const name = $("#nm").value.trim(); if (!name) { $("#err").textContent = "Apna naam likho."; return; }
-      if (nameTaken(name)) { $("#err").textContent = "Is naam se koi pehle se hai. Thoda alag likho, jaise surname ke saath."; return; }
-      const gender = onb.querySelector("input[name=g]:checked")?.value || null;
-      const row = newMember(name, gender, { claimed:true });
-      const { error } = await S.sb.from("members").insert(row);
-      if (error) { $("#err").textContent = "Register nahi ho paaya. Net check karke dobara try karo."; return; }
-      S.me = row.id; ls.set("fkd-me", S.me); S.members.push(row); await loadRelations();
-      if (others().length) onbRishte(); else startApp("parivaar");
+      if (nameTaken(name, list)) { $("#err").textContent = NAME_TAKEN; return; }
+      go(null, name, onb.querySelector("input[name=g]:checked")?.value || "");
     };
+  }
+
+  // Asked to join; waits (checking every few seconds) until an admin says yes or no.
+  function onbWaiting(who){
+    const wa = waLink("Maine Family Ka Din mein judne ki request bheji hai. Parivaar tab mein approve kar do.");
+    showOnb(`
+      ${stepBar(3)}
+      <h2>Request bhej di</h2>
+      <p class="lead">${who.want_name ? `<b>${esc(who.want_name)}</b> ke naam se aapki` : "Aapki"} request ${esc(who.family.name)} ke admin ke paas hai. Woh haan karenge, phir app apne aap khul jayega.</p>
+      <a class="btn go" href="${esc(wa)}" target="_blank" rel="noopener">Admin ko WhatsApp pe batao</a>
+      <button type="button" class="linkish mid" id="cancelReq">Request wapas lo</button>`);
+    $("#cancelReq").onclick = () => dropDevice(S.uid).then(forgetDevice, () => { $("#cancelReq").textContent = NET; });
+    const t = setInterval(async () => {
+      if (!$("#cancelReq")) return clearInterval(t);   // left this screen
+      if (document.hidden) return;
+      const w = await rpc("whoami").catch(() => "offline");
+      if (w === "offline" || w?.approved === false) return;  // still waiting
+      clearInterval(t);
+      w ? enter(w, true) : onbWelcome("Admin ne yeh request mana kar di. Kuch galat laga toh unse baat karo aur naya invite link maango.");
+    }, 8000);
   }
 
   function onbRishte(){
@@ -796,7 +832,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     return `<button type="button" class="mrow" data-act="relpick" data-id="${esc(m.id)}">
       <span class="ava" style="background:${esc(m.color)}">${avaInner(m.id)}</span>
       <span class="info"><strong>${esc(m.name)}</strong>
-        <span>${r ? `Mere liye: <b>${esc(r)}</b>` : sug ? `Suggestion: <b>${esc(sug)}</b>` : "Rishta chuno"}${!m.claimed ? " · abhi juda nahi" : ""}</span></span>
+        <span>${r ? `Mere liye: <b>${esc(r)}</b>` : sug ? `Suggestion: <b>${esc(sug)}</b>` : "Rishta chuno"}${!m.claimed ? " · abhi juda nahi" : m.is_admin ? " · admin" : ""}</span></span>
       <span class="chev" aria-hidden="true">›</span></button>`;
   }
 
@@ -806,27 +842,26 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       showOnb(`<h1 class="hero">Family Ka Din</h1><p class="lead">App abhi set up nahi hua hai. config.js mein Supabase ka URL aur key daalo (README dekho).</p>`);
       return;
     }
-    let join = null;
-    try { join = new URLSearchParams(location.search).get("join"); } catch {}
-    const code = ls.get("fkd-code");
-    if (join && (!code || join.toUpperCase() !== code)) {
-      try { history.replaceState(null, "", location.pathname); } catch {}
-      return onbJoin(join.toUpperCase());
-    }
-    if (!code) return onbWelcome();
+    S.sb = S.sb || window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey);
+    const q = new URLSearchParams(location.search), invite = q.get("invite"), oldLink = q.get("join");
+    if (invite || oldLink) try { history.replaceState(null, "", location.pathname); } catch {}
     try {
-      const r = await familyFor(code);
-      if (!r) { ls.del("fkd-code"); ls.del("fkd-me"); return onbWelcome(); }
-      S.sb = r.sb; S.fam = r.fam;
-      await loadMembers();
-      const me = meM();
-      if (!me) { S.me = null; ls.del("fkd-me"); return onbWho(false); }
-      await loadRelations();
-      startApp();
-    } catch {
-      showOnb(`<h1 class="hero">Family Ka Din</h1><p class="lead">Net nahi mil raha.</p><button type="button" class="btn go" id="retry">Dobara try karo</button>`);
-      $("#retry").onclick = boot;
-    }
+      S.uid = (await S.sb.auth.getSession()).data.session?.user.id || null;
+      let who = S.uid ? await rpc("whoami") : null, note = "";
+      // A phone from before logins: move it over with the code and name it saved.
+      const code = ls.get("fkd-code"), me = ls.get("fkd-me");
+      if (!who && code && me) {
+        await signIn();
+        who = await rpc("move_old_phone", { old_code:code, old_member:me, device_label:devLabel() }).catch(() => undefined);
+        if (who !== undefined) OLD_KEYS.forEach(k => ls.del(k));    // moved, or the code is closed; undefined = try again next time
+        if (who === null) note = "Purana code ab band ho gaya hai. Kisi se naya invite link maango.";
+      }
+      if (who?.approved) return enter(who);
+      if (who) return onbWaiting(who);
+      if (invite) return onbInvite(invite);
+      if (ls.get("fkd-in")) return onbGone();
+      onbWelcome(oldLink ? "Yeh purana code wala link hai. Ab sirf invite link se judte hain: jisne bheja, unse Parivaar tab se naya invite link maango." : note);
+    } catch { offlineScreen(boot); }
   }
 
   function startApp(mode){
@@ -838,10 +873,13 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     if (!S.started) {
       S.started = true;
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => render());
-      setInterval(() => { if (!document.hidden && !$("#app").hidden) loadDay(true); }, 30000);
+      setInterval(async () => {
+        if (!document.hidden && !$("#app").hidden && await stillIn()) { await loadAdmin(); loadDay(true); }
+      }, 30000);
       document.addEventListener("visibilitychange", async () => {
         if (document.hidden || $("#app").hidden) return;
-        await Promise.all([loadMembers(), loadRelations()]); loadDay(true);
+        const [ok] = await Promise.all([stillIn(), loadMembers(), loadRelations(), loadAdmin()]);
+        if (ok) loadDay(true);
       });
       new ResizeObserver(() => document.documentElement.style.setProperty("--hdr", $("#hdr").offsetHeight + "px")).observe($("#hdr"));
     }
@@ -854,13 +892,13 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     $("#meDot").innerHTML = me ? avaInner(me.id) : "?";
     $("#meName").textContent = me ? me.name : "";
     const d = parseDay(S.day), isToday = S.day === todayKey();
-    const yest = S.day === shiftDay(todayKey(), -1);
-    $("#dayTitle").textContent = isToday ? "Aaj" : yest ? "Kal" : VAAR[d.getDay()];
+    $("#dayTitle").textContent = relDay(S.day) || VAAR[d.getDay()];
     $("#daySub").textContent = `${VAAR[d.getDay()]}, ${d.getDate()} ${MON[d.getMonth()]}`;
     $("#nextDay").disabled = isToday;
     $("#mPhotos").setAttribute("aria-pressed", S.mode==="photos");
     $("#mDil").setAttribute("aria-pressed", S.mode==="dil");
     $("#mFam").setAttribute("aria-pressed", S.mode==="parivaar");
+    $("#mFam").classList.toggle("ask", isAdmin() && S.devices.some(d => !d.approved_at));  // a phone waits for approval
 
     const fam = S.mode === "parivaar", dil = S.mode === "dil";
     $("#daynav").hidden = fam; $("#who").hidden = fam;
@@ -919,7 +957,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     const tilt = [-0.8, 0.6, -0.4, 0.9][i % 4];
     const who = c.member ? whoHTML(c.member) : `<span class="nm"><span class="dot gupt">?</span>Gupt</span>`;
     const rx = S.reacts.filter(r => r.confession_id === c.id);
-    const canDel = (c.member && c.member === S.me) || mine.has(c.id);
+    const canDel = (c.member && c.member === S.me) || !!guptKeys.key(c.id);
     const btns = stampBtns(REACTS, rx, `data-act="react" data-id="${esc(c.id)}"`);
     const md = MOODS[c.mood] || MOODS.yunhi;
     const label = c.mood === "custom" ? (c.mood_label || "Kuch aur") : md[0];
@@ -1024,12 +1062,61 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
   }
 
   const REMIND = [["Band", null], ["Subah 9", 9], ["Dopahar 1", 13], ["Shaam 6", 18], ["Raat 9", 21]];
-  const inviteLink = () => `${location.origin}${location.pathname}?join=${encodeURIComponent(S.fam.code)}`;
+  // A plain (non-tappable) row in a .mrows list, with buttons on the right.
+  const infoRow = (title, sub, acts) => `<div class="mrow"><span class="info"><strong>${title}</strong><span>${sub}</span></span>${acts ? `<span class="acts">${acts}</span>` : ""}</div>`;
+  const seenAt = ts => {
+    const d = new Date(ts), w = relDay(dayKey(d));
+    return w === "Aaj" ? `aaj ${tstr(ts)} ${ap(d.getHours())}` : w ? "kal" : `${d.getDate()} ${MON[d.getMonth()]}`;
+  };
+  const hrs = ts => Math.max(1, Math.round((new Date(ts) - Date.now()) / 36e5));
+  const refreshAdmin = () => loadAdmin().then(render);
+  // An admin-screen action: on failure say why; either way redraw from the database.
+  const adminAct = (p, fallback) => p.catch(e => failSheet(errText(e, fallback))).then(refreshAdmin);
+  function accessHTML(){
+    const links = S.invites.length ? `<section class="sec">
+        <h3>Khule invite link</h3>
+        <p>Jab tak inse koi juda nahi, inhe cancel kar sakte ho.</p>
+        <div class="mrows">${S.invites.map(i => infoRow(`${esc(mName(i.created_by))} ka link`, `${hrs(i.expires_at)} ghante aur chalega`,
+          `<button type="button" class="linkish warn" data-act="uninvite" data-id="${esc(i.id)}">Cancel karo</button>`)).join("")}</div>
+      </section>` : "";
+    if (!isAdmin()) return links;
+    const waiting = S.devices.filter(d => !d.approved_at), phones = S.devices.filter(d => d.approved_at);
+    return `${waiting.length ? `<section class="sec">
+        <h3>Judne ki request · ${waiting.length}</h3>
+        <p>Pehchaante ho, tabhi haan karo.</p>
+        <div class="mrows">${waiting.map(d => infoRow(esc(d.want_name || mName(d.member_id)), `${d.want_name ? "Naya member" : "Naya phone"} · ${esc(d.label)}`,
+          `<button type="button" class="btn pri" data-act="approve" data-id="${esc(d.user_id)}">Haan</button>
+           <button type="button" class="btn" data-act="rmphone" data-id="${esc(d.user_id)}">Mana</button>`)).join("")}</div>
+      </section>` : ""}
+      ${links}
+      <section class="sec">
+        <h3>Phones</h3>
+        <p>Parivaar ke saare phone. Koi phone kho gaya ya kisi aur ke paas hai, toh use hatao.</p>
+        <div class="mrows">${phones.map(d => infoRow(`${esc(mName(d.member_id))}${d.user_id === S.uid ? " · yeh phone" : ""}`, `${esc(d.label)} · ${seenAt(d.last_seen)}`,
+          d.user_id === S.uid ? "" : `<button type="button" class="linkish warn" data-act="rmphone" data-id="${esc(d.user_id)}">Hatao</button>`)).join("")}</div>
+      </section>`;
+  }
+
+  async function inviteSheet(btn){
+    btn.disabled = true;
+    try {
+      const { token } = await rpc("create_invite");
+      const link = `${location.origin}${location.pathname}?invite=${token}`;
+      const wa = waLink(`${S.fam.name} mein judo! Family Ka Din app is link se kholo (48 ghante tak): ${link}`);
+      openSheet(`<h2>Invite link taiyaar hai</h2>
+        <p class="small">Ek phone ke liye, 48 ghante tak. Kholne ke baad admin haan karenge, tab woh jud payenge.</p>
+        <input class="field" id="il" value="${esc(link)}" readonly aria-label="Invite link">
+        <div class="row"><a class="btn pri" href="${esc(wa)}" target="_blank" rel="noopener">WhatsApp pe bhejo</a><button type="button" class="btn" id="ic">Copy karo</button></div>
+        <button type="button" class="btn" data-close>Band karo</button>`);
+      $("#ic").onclick = () => navigator.clipboard.writeText(link).then(() => { $("#ic").textContent = "Copy ho gaya"; }, () => $("#il").select());
+      refreshAdmin();
+    } catch { btn.textContent = "Link nahi ban paaya. Dobara try karo"; }
+    btn.disabled = false;
+  }
+  function failSheet(text){ openSheet(`<h2>Nahi ho paaya</h2><p>${text}</p><button type="button" class="btn" data-close>Theek hai</button>`); }
 
   function renderParivaar(){
     const me = meM();
-    const link = inviteLink();
-    const wa = "https://wa.me/?text=" + encodeURIComponent(`${S.fam.name} mein judo! Family Ka Din app kholo: ${link}\nCode: ${S.fam.code}`);
     const sugg = S.relIn.map(r => {
       const owner = member(r.owner); if (!owner || S.rel[owner.id]) return null;
       const s = inverseOf(r.label, owner.gender); if (!s) return null;
@@ -1039,11 +1126,11 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     return `<div class="fam">
       ${installCard(false)}
       <section class="invite">
-        <small>Parivaar ka code</small>
-        <div class="code">${esc(S.fam.code)}</div>
-        <p>Yeh code ya link bhejo. Jo bhi kholega, ${esc(S.fam.name)} mein jud jayega.</p>
-        <div class="row"><a class="wa" href="${esc(wa)}" target="_blank" rel="noopener">WhatsApp pe bhejo</a><button type="button" data-act="copylink">Link copy karo</button></div>
+        <small>Naye log jodo</small>
+        <p>Har phone ke liye naya invite link banao. Link 48 ghante chalega, sirf ek baar. Admin ki haan ke baad hi koi judega.</p>
+        <div class="row"><button type="button" data-act="invite">Invite link banao</button></div>
       </section>
+      ${accessHTML()}
 
       ${sugg.map(x => `<section class="sugg">
         <p><b>${esc(x.owner.name)}</b> ne aapko <b>${esc(x.given)}</b> kaha hai. Aapke liye ${esc(x.owner.name)}: <b>${esc(x.s)}</b>?</p>
@@ -1063,12 +1150,12 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       <section class="sec">
         <h3>Mera parivaar</h3>
         <p>Har kisi ke aage apna rishta likho. Yeh sirf aapke phone pe aapko dikhega, baaki sab apna-apna rakhenge.</p>
-        ${joined.length ? `<div class="mrows">${joined.map(relRowHTML).join("")}</div>` : `<p class="small">Abhi aur koi nahi juda. Upar se code bhejo.</p>`}
+        ${joined.length ? `<div class="mrows">${joined.map(relRowHTML).join("")}</div>` : `<p class="small">Abhi aur koi nahi juda. Upar se invite link bhejo.</p>`}
       </section>
 
       ${waiting.length ? `<section class="sec">
         <h3>Abhi juda nahi</h3>
-        <p>Inhe aapne ya kisi aur ne pehle se joda hai. Jab yeh app kholenge, apna naam chun lenge.</p>
+        <p>Inhe aapne ya kisi aur ne pehle se joda hai. Invite link kholke yeh apna naam chun lenge.</p>
         <div class="mrows">${waiting.map(relRowHTML).join("")}</div>
       </section>` : ""}
 
@@ -1081,8 +1168,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 
       <section class="foot">
         <button type="button" class="linkish" data-act="renamefam">Parivaar ka naam badlo</button>
-        <button type="button" class="linkish" data-act="switchuser">Is phone pe koi aur hai? User badlo</button>
-        <button type="button" class="linkish" data-act="leavefam">Doosre parivaar mein jao</button>
+        <button type="button" class="linkish" data-act="leavefam">Is phone se log out karo</button>
         <button type="button" class="linkish warn" data-act="leaveself">Parivaar chhodo aur apna naam hatao</button>
       </section>
     </div>`;
@@ -1158,12 +1244,19 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
       <p class="err" id="rErr"></p>
       <div class="row">${cur?`<button type="button" class="btn warn" id="clr">Rishta hatao</button>`:""}<button type="button" class="btn" data-close>Band karo</button></div>
       ${!m.claimed ? `<button type="button" class="linkish mid" id="rm">${esc(m.name)} ko list se hatao</button>`
-        : `<button type="button" class="linkish mid warn" id="rmc">${esc(m.name)} ko parivaar se hatao</button>`}`);
+        : isAdmin() ? `<button type="button" class="linkish mid" id="adm">${m.is_admin ? `${esc(m.name)} ko admin se hatao` : `${esc(m.name)} ko admin banao`}</button>
+          <button type="button" class="linkish mid warn" id="rmc">${esc(m.name)} ko parivaar se hatao</button>` : ""}`);
+    const adm = $("#adm");
+    if (adm) adm.onclick = async () => {
+      try { await rpc("set_admin", { target:id, make:!m.is_admin }); await loadMembers(); closeSheet(); render(); }
+      catch (e) { $("#rErr").textContent = errText(e); }
+    };
     const rmc = $("#rmc");
-    if (rmc) rmc.onclick = () => confirmSheet(`${esc(m.name)} ko hatana hai?`, "Unki saari photos, comments aur doodles bhi hat jayenge, aur unki dil ki baatein Gupt ban jayengi. Yeh wapas nahi hoga.", "Haan, hatao", async () => {
-      const { error } = await S.sb.from("members").delete().eq("id", id);
-      if (!error) { S.members = S.members.filter(x => x.id !== id); delete S.rel[id]; loadDay(true); }
-      render();
+    if (rmc) rmc.onclick = () => confirmSheet(`${esc(m.name)} ko hatana hai?`, "Unki saari photos, comments aur doodles bhi hat jayenge, unke phone bahar ho jayenge, aur unki dil ki baatein Gupt ban jayengi. Yeh wapas nahi hoga.", "Haan, hatao", async () => {
+      try { await rpc("remove_member", { target:id }); }
+      catch (e) { return failSheet(errText(e)); }
+      S.members = S.members.filter(x => x.id !== id); delete S.rel[id];
+      loadAdmin(); loadDay(true);
     });
     const save = async label => {
       if (!(await setRelation(id, label))) { $("#rErr").textContent = "Save nahi hua. Dobara try karo."; return; }
@@ -1183,7 +1276,7 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
 
   function addMemberSheet(){
     openSheet(`<h2>Kisi ko parivaar mein jodo</h2>
-      <p class="small">Unka naam pehle se jod do. Jab woh code se judenge, bas apna naam chun lenge. Chaho toh unhe seedha code bhej do.</p>
+      <p class="small">Unka naam pehle se jod do. Jab woh invite link kholenge, bas apna naam chun lenge. Link Parivaar tab mein "Invite link banao" se banta hai.</p>
       <form class="stack" id="af">
         <input class="field" id="an" maxlength="30" placeholder="Naam, jaise: Rohit" aria-label="Naam">
         ${genderPick("ag", "", "Optional")}
@@ -1193,12 +1286,12 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     $("#af").onsubmit = async e => {
       e.preventDefault();
       const name = $("#an").value.trim(); if (!name) return;
-      if (nameTaken(name)) { $("#aErr").textContent = "Is naam se koi pehle se hai."; return; }
+      if (nameTaken(name)) { $("#aErr").textContent = NAME_TAKEN; return; }
       const gender = sheet.querySelector("input[name=ag]:checked")?.value || null;
-      const row = newMember(name, gender, { claimed:false, added_by:S.me });
-      const { error } = await S.sb.from("members").insert(row);
+      // The database picks the colour, so read the saved row back.
+      const { data, error } = await S.sb.from("members").insert({ id:uid(), family_id:S.fam.id, name, gender, added_by:S.me }).select().single();
       if (error) { $("#aErr").textContent = "Nahi jud paaya. Dobara try karo."; return; }
-      S.members.push(row); closeSheet(); render(); relSheet(row.id);
+      S.members.push(data); closeSheet(); render(); relSheet(data.id);
     };
   }
 
@@ -1377,13 +1470,14 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     $("#gupt").addEventListener("change", drawWho);
     send.addEventListener("click", async () => {
       const text = body.value.trim().slice(0, 400); if (!text) return;
-      const gupt = $("#gupt").checked;
+      const isGupt = $("#gupt").checked;
       send.disabled = true; send.textContent = "Chipka rahe hain…";
-      const id = uid();
+      const id = uid(), key = isGupt ? uid() : null;
       const mood_label = mood === "custom" ? ($("#moodLabel").value.trim().slice(0,16) || null) : null;
-      const { error } = await S.sb.from("confessions").insert({ id, family_id:S.fam.id, member: gupt ? null : S.me, mood, mood_label, body:text, prompt, day: todayKey() });
+      const { error } = await S.sb.from("confessions").insert({ id, family_id:S.fam.id, member: isGupt ? null : S.me, mood, mood_label, body:text, prompt, day: todayKey(),
+        delete_hash: key && await sha256(key) });
       if (error) { $("#dErr").textContent = "Nahi chipka paaye. Net check karke dobara try karo."; send.disabled = false; send.textContent = "Chipka do"; return; }
-      mine.add(id);
+      if (key) guptKeys.add(id, key);
       showToday();
     });
   }
@@ -1536,18 +1630,14 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     const id = btn.dataset.id;
     if (!armed(btn)) return;
     btn.disabled = true;
-    const { error } = await S.sb.from("confessions").delete().eq("id", id);
-    if (error) { btn.disabled = false; btn.textContent = "Hata nahi paaye"; return; }
+    const key = guptKeys.key(id);  // a Gupt note: only the key this phone kept can delete it
+    const done = await (key ? rpc("delete_gupt", { note:id, key }) : S.sb.from("confessions").delete().eq("id", id).then(must)).catch(() => false);
+    if (done === false) { btn.disabled = false; btn.textContent = "Hata nahi paaye"; return; }
     S.conf = S.conf.filter(c => c.id !== id); render();
   }
 
   // Tap-twice delete: the first tap only arms the button. A redraw disarms it.
   function armed(b){ if (b.dataset.armed) return true; b.dataset.armed = "1"; b.textContent = "Pakka hatana hai?"; b.classList.add("armed"); return false; }
-  async function copyLink(btn){
-    const link = inviteLink();
-    try { await navigator.clipboard.writeText(link); btn.textContent = "Copy ho gaya"; }
-    catch { openSheet(`<h2>Yeh link bhejo</h2><input class="field" value="${esc(link)}" readonly aria-label="Invite link"><button type="button" class="btn" data-close>Band karo</button>`); sheet.querySelector("input").select(); }
-  }
 
   /* ================= events ================= */
   document.addEventListener("click", e => {
@@ -1571,14 +1661,15 @@ textarea.field{resize:vertical;min-height:130px;font-family:var(--hand);font-siz
     else if (a === "installx") { ls.set("fkd-install-x", "1"); render(); }
     else if (a === "remind") setReminder(t.dataset.h === "" ? null : Number(t.dataset.h));
     else if (a === "leaveself") confirmSheet("Parivaar chhodna hai?", "Aapka naam, photos, comments aur doodles hat jayenge, aur aapki dil ki baatein Gupt ban jayengi. Yeh wapas nahi hoga.", "Haan, chhodo", async () => {
-      const { error } = await S.sb.from("members").delete().eq("id", S.me);
-      if (error) return;
-      forgetDevice();
+      rpc("remove_member", { target:S.me }).then(forgetDevice, e => failSheet(errText(e)));
     });
     else if (a === "renamefam") renameFamSheet();
-    else if (a === "copylink") copyLink(t);
-    else if (a === "switchuser") confirmSheet("User badlo?", "Is phone se aap log out ho jaoge. Aapki photos aur baatein waise hi rahengi.", "Haan, badlo", () => { ls.del("fkd-me"); S.me = null; S.rel = {}; S.relIn = []; onbWho(false); });
-    else if (a === "leavefam") confirmSheet("Doosre parivaar mein jao?", `Is phone se ${esc(S.fam.name)} hat jayega. Wapas aane ke liye code chahiye hoga: <b>${esc(S.fam.code)}</b>`, "Haan, jao", () => { forgetDevice(); });
+    else if (a === "leavefam") confirmSheet("Is phone se log out karna hai?", `Aapki photos aur baatein ${esc(S.fam.name)} mein waise hi rahengi. Is phone pe wapas aane ke liye naya invite link aur admin ki haan chahiye hogi.`, "Haan, log out",
+      () => dropDevice(S.uid).then(forgetDevice, () => failSheet(NET)));
+    else if (a === "invite") inviteSheet(t);
+    else if (a === "uninvite") adminAct(S.sb.from("invites").update({ revoked_at:new Date().toISOString() }).eq("id", t.dataset.id).then(must));
+    else if (a === "approve") { t.disabled = true; adminAct(rpc("approve_device", { device:t.dataset.id }).then(loadMembers)); }
+    else if (a === "rmphone") { if (armed(t)) adminAct(dropDevice(t.dataset.id)); }
   });
 
   if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
