@@ -166,6 +166,7 @@ header{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;
 .mrow .info strong{font-size:17px}
 .mrow .info span{font-size:14px;color:var(--muted)}
 .mrow .info span b{color:var(--ink);font-weight:600}
+.mrow .info .caution{display:block;font-style:normal;color:var(--error);margin-top:2px}
 .chev{color:var(--muted);font-size:20px}
 .mrow .acts{display:flex;gap:8px;align-items:center;flex:none}
 .mrow .acts .btn{flex:none;padding:6px 14px}
@@ -626,7 +627,7 @@ a.btn{text-decoration:none;text-align:center}
   // Phones (admins: the whole family's; others: their own) and open invite links.
   async function loadAdmin(){
     const [d, i] = await Promise.all([
-      S.sb.from("devices").select("user_id, member_id, want_name, label, last_seen, approved_at").order("created_at"),
+      S.sb.from("devices").select("user_id, member_id, want_name, label, last_seen, approved_at, invited_by").order("created_at"),
       S.sb.from("invites").select("id, created_by, expires_at").is("used_at", null).is("revoked_at", null)
         .gt("expires_at", new Date().toISOString()).order("created_at")
     ]);
@@ -1072,6 +1073,16 @@ a.btn{text-decoration:none;text-align:center}
   const refreshAdmin = () => loadAdmin().then(render);
   // An admin-screen action: on failure say why; either way redraw from the database.
   const adminAct = (p, fallback) => p.catch(e => failSheet(errText(e, fallback))).then(refreshAdmin);
+  // A waiting phone's details. Asking to be someone who already has a phone is how a
+  // forwarded link could take over a person (and their admin rights), so say so plainly.
+  function askWhat(d, phones){
+    const by = d.invited_by ? ` · ${esc(mName(d.invited_by))} ka link` : "";
+    const line = `${d.want_name ? "Naya member" : "Naya phone"} · ${esc(d.label)}${by}`;
+    if (d.want_name || !phones.some(p => p.member_id === d.member_id)) return line;
+    const n = esc(mName(d.member_id));
+    return `${line}<em class="caution">${n} ka phone pehle se juda hai. ${n} se pooch ke hi haan karo${
+      member(d.member_id)?.is_admin ? ", yeh phone bhi admin ban jayega" : ""}.</em>`;
+  }
   function accessHTML(){
     const links = S.invites.length ? `<section class="sec">
         <h3>Khule invite link</h3>
@@ -1084,7 +1095,7 @@ a.btn{text-decoration:none;text-align:center}
     return `${waiting.length ? `<section class="sec">
         <h3>Judne ki request · ${waiting.length}</h3>
         <p>Pehchaante ho, tabhi haan karo.</p>
-        <div class="mrows">${waiting.map(d => infoRow(esc(d.want_name || mName(d.member_id)), `${d.want_name ? "Naya member" : "Naya phone"} · ${esc(d.label)}`,
+        <div class="mrows">${waiting.map(d => infoRow(esc(d.want_name || mName(d.member_id)), askWhat(d, phones),
           `<button type="button" class="btn pri" data-act="approve" data-id="${esc(d.user_id)}">Haan</button>
            <button type="button" class="btn" data-act="rmphone" data-id="${esc(d.user_id)}">Mana</button>`)).join("")}</div>
       </section>` : ""}
