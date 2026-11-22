@@ -492,7 +492,7 @@ a.btn{text-decoration:none;text-align:center}
   /* ================= state ================= */
   const cfg = window.FAMILY_CONFIG || {};
   const S = {
-    sb:null, uid:null, fam:null, members:[], rel:{}, relIn:[], me:null, devices:[], invites:[],
+    sb:null, uid:null, fam:null, members:[], rel:{}, relIn:[], me:null, devices:[], invites:[], backup:null,
     mode: ["dil","parivaar"].includes(ls.get("fkd-mode")) ? ls.get("fkd-mode") : "photos",
     day: todayKey(), posts:[], conf:[], reacts:[], preacts:[], comments:[], doodles:[], view:"timeline", filter:"all",
     loading:true, offline:false, reqId:0, started:false
@@ -1105,6 +1105,12 @@ a.btn{text-decoration:none;text-align:center}
         <p>Parivaar ke saare phone. Koi phone kho gaya ya kisi aur ke paas hai, toh use hatao.</p>
         <div class="mrows">${phones.map(d => infoRow(`${esc(mName(d.member_id))}${d.user_id === S.uid ? " · yeh phone" : ""}`, `${esc(d.label)} · ${seenAt(d.last_seen)}`,
           d.user_id === S.uid ? "" : `<button type="button" class="linkish warn" data-act="rmphone" data-id="${esc(d.user_id)}">Hatao</button>`)).join("")}</div>
+      </section>
+      <section class="sec">
+        <h3>Backup</h3>
+        <p>Parivaar ki saari photos aur baatein ek ZIP file mein, isi phone pe. File badi hogi, Wi-Fi pe karo.</p>
+        <button type="button" class="btn" data-act="backup"${S.backup?.busy ? " disabled" : ""}>Backup download karo</button>
+        <p class="small" id="bkNote" role="status" style="margin-top:8px">${esc(S.backup?.note || "")}</p>
       </section>`;
   }
 
@@ -1124,6 +1130,79 @@ a.btn{text-decoration:none;text-align:center}
     } catch { btn.textContent = "Link nahi ban paaya. Dobara try karo"; }
     btn.disabled = false;
   }
+  /* ---------- backup: every photo and row, zipped on the phone ---------- */
+  // ZIP without compression (photos are JPEG already). Enough for any unzip app; < 4 GB.
+  const CRC = Array.from({ length:256 }, (_, n) => { for (let k = 0; k < 8; k++) n = n & 1 ? 0xEDB88320 ^ (n >>> 1) : n >>> 1; return n >>> 0; });
+  const crc32 = b => { let c = ~0; for (let i = 0; i < b.length; i++) c = CRC[(c ^ b[i]) & 255] ^ (c >>> 8); return ~c >>> 0; };
+  async function zipBlob(files){   // [{ name, data:Blob, date:Date }]
+    const enc = new TextEncoder(), parts = [], dir = []; let off = 0;
+    const head = (size, fill) => { const v = new DataView(new ArrayBuffer(size)); fill((i, x, w) => w === 4 ? v.setUint32(i, x, true) : v.setUint16(i, x, true)); return v.buffer; };
+    for (const f of files) {
+      const name = enc.encode(f.name), crc = crc32(new Uint8Array(await f.data.arrayBuffer())), n = f.data.size, d = f.date;
+      const time = d.getHours() << 11 | d.getMinutes() << 5 | d.getSeconds() >> 1;
+      const date = (d.getFullYear() - 1980) << 9 | (d.getMonth() + 1) << 5 | d.getDate();
+      // shared part of both headers: version 20, UTF-8 names, stored, time, date, crc, sizes, name length
+      const common = (w, i) => { w(i, 20); w(i+2, 0x0800); w(i+4, 0); w(i+6, time); w(i+8, date); w(i+10, crc, 4); w(i+14, n, 4); w(i+18, n, 4); w(i+22, name.length); };
+      parts.push(head(30, w => { w(0, 0x04034b50, 4); common(w, 4); }), name, f.data);
+      dir.push(head(46, w => { w(0, 0x02014b50, 4); w(4, 20); common(w, 6); w(42, off, 4); }), name);
+      off += 30 + name.length + n;
+    }
+    const size = dir.reduce((a, x) => a + x.byteLength, 0);
+    const end = head(22, w => { w(0, 0x06054b50, 4); w(8, files.length); w(10, files.length); w(12, size, 4); w(16, off, 4); });
+    return new Blob([...parts, ...dir, end], { type:"application/zip" });
+  }
+  async function allRows(table, cols, order){   // past the API's 1000-row page
+    const out = [];
+    for (let from = 0; ; from += 1000) {
+      let q = S.sb.from(table).select(cols).range(from, from + 999);
+      for (const c of order) q = q.order(c);
+      const rows = must(await q); out.push(...rows);
+      if (rows.length < 1000) return out;
+    }
+  }
+  async function backup(){
+    if (S.backup?.busy) return;
+    const say = note => { S.backup = { busy:true, note }; const el = $("#bkNote"); if (el) el.textContent = note; };
+    try {
+      say("Baatein ikattha kar rahe hain…"); render();
+      const [posts, comments, photo_reactions, doodles, confessions, reactions] = await Promise.all([
+        allRows("posts", "id, member, tag, caption, day, path, ts", ["ts", "id"]),
+        allRows("comments", "id, post_id, member, body, ts", ["ts", "id"]),
+        allRows("photo_reactions", "post_id, member, kind", ["post_id", "member", "kind"]),
+        allRows("doodles", "id, post_id, member, vb, strokes, ts", ["ts", "id"]),
+        allRows("confessions", "id, member, mood, mood_label, body, prompt, day, ts", ["ts", "id"]),
+        allRows("reactions", "confession_id, member, kind", ["confession_id", "member", "kind"])
+      ]);
+      const files = [], missing = []; let done = 0, i = 0;
+      const clean = t => String(t).replace(/[\/:*?"<>|\x00-\x1f]/g, "").trim() || "Koi";
+      const fetchOne = async p => {
+        const t = new Date(p.ts), hm = String(t.getHours()).padStart(2, "0") + String(t.getMinutes()).padStart(2, "0");
+        p.file = `photos/${p.day}/${hm} ${clean(mName(p.member))} ${tagName(p)} ${p.id.slice(0, 4)}.jpg`;
+        const { data, error } = await S.sb.storage.from("photos").download(p.path);
+        if (error) { missing.push(p.path); p.file = null; }
+        else files.push({ name:p.file, data, date:t });
+        say(`Photo ${++done} / ${posts.length}…`);
+      };
+      await Promise.all(Array.from({ length:4 }, async () => { while (i < posts.length) await fetchOne(posts[i++]); }));
+      files.sort((a, b) => a.name < b.name ? -1 : 1);
+      const data = { family:S.fam.name, exported_at:new Date().toISOString(),
+        members:S.members.map(({ id, name, gender, color, is_admin, mark }) => ({ id, name, gender, color, is_admin, mark })),
+        posts, comments, photo_reactions, doodles, confessions, reactions, missing_photos:missing };
+      files.unshift({ name:"family-ka-din.json", data:new Blob([JSON.stringify(data, null, 1)]), date:new Date() });
+      say("ZIP bana rahe hain…");
+      const blob = await zipBlob(files), a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${clean(S.fam.name)} ${todayKey()}.zip`;
+      document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 60_000);
+      const mb = Math.max(1, Math.round(blob.size / 1e6));
+      S.backup = { note:`Ho gaya: ${posts.length - missing.length} photos, ${mb} MB. File phone ke Downloads mein hai.${missing.length ? ` ${missing.length} photo nahi mil paayi.` : ""}` };
+    } catch (e) {
+      S.backup = { note:errText(e) };
+    }
+    render();
+  }
+
   function failSheet(text){ openSheet(`<h2>Nahi ho paaya</h2><p>${text}</p><button type="button" class="btn" data-close>Theek hai</button>`); }
 
   function renderParivaar(){
@@ -1678,6 +1757,7 @@ a.btn{text-decoration:none;text-align:center}
     else if (a === "leavefam") confirmSheet("Is phone se log out karna hai?", `Aapki photos aur baatein ${esc(S.fam.name)} mein waise hi rahengi. Is phone pe wapas aane ke liye naya invite link aur admin ki haan chahiye hogi.`, "Haan, log out",
       () => dropDevice(S.uid).then(forgetDevice, () => failSheet(NET)));
     else if (a === "invite") inviteSheet(t);
+    else if (a === "backup") backup();
     else if (a === "uninvite") adminAct(S.sb.from("invites").update({ revoked_at:new Date().toISOString() }).eq("id", t.dataset.id).then(must));
     else if (a === "approve") { t.disabled = true; adminAct(rpc("approve_device", { device:t.dataset.id }).then(loadMembers)); }
     else if (a === "rmphone") { if (armed(t)) adminAct(dropDevice(t.dataset.id)); }
