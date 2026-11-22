@@ -711,6 +711,8 @@ a.btn{text-decoration:none;text-align:center}
     ls.set("fkd-in", "1");
     try { navigator.storage?.persist?.(); } catch {}  // ask Chrome not to clear the login under storage pressure
     await Promise.all([loadMembers(), loadRelations(), loadAdmin()]);
+    // Push addresses change now and then; re-save it quietly whenever notifications are allowed.
+    if (cfg.vapidPublicKey && window.Notification?.permission === "granted") pushOn();
     if (fresh && others().length) onbRishte(); else startApp(fresh ? "parivaar" : undefined);
   }
   function onbGone(){ ls.del("fkd-in"); onbWelcome("Yeh phone ab parivaar mein nahi hai. Wapas judne ke liye kisi se naya invite link maango."); }
@@ -1063,6 +1065,7 @@ a.btn{text-decoration:none;text-align:center}
   }
 
   const REMIND = [["Band", null], ["Subah 9", 9], ["Dopahar 1", 13], ["Shaam 6", 18], ["Raat 9", 21]];
+  const NOTIFY = [["Sab kuch", "all"], ["Sirf meri photo pe", "mine"], ["Band", "off"]];
   // A plain (non-tappable) row in a .mrows list, with buttons on the right.
   const infoRow = (title, sub, acts) => `<div class="mrow"><span class="info"><strong>${title}</strong><span>${sub}</span></span>${acts ? `<span class="acts">${acts}</span>` : ""}</div>`;
   const seenAt = ts => {
@@ -1249,6 +1252,13 @@ a.btn{text-decoration:none;text-align:center}
         <p>Inhe aapne ya kisi aur ne pehle se joda hai. Invite link kholke yeh apna naam chun lenge.</p>
         <div class="mrows">${waiting.map(relRowHTML).join("")}</div>
       </section>` : ""}
+
+      <section class="sec">
+        <h3>Notification</h3>
+        <p>Jab koi photo ya Dil Ki Baat daale, ya aapki photo pe kuch likhe ya stamp lagaye. Raat 10 se subah 7 tak chup.</p>
+        <div class="chips">${NOTIFY.map(([l, v]) => `<button type="button" data-act="notify" data-v="${v}" aria-pressed="${(me.notify || "all") === v && (v === "off" || window.Notification?.permission === "granted")}">${l}</button>`).join("")}</div>
+        <p class="small" id="nnote" style="margin-top:8px">${esc(S.notifyNote || "")}</p>
+      </section>
 
       <section class="sec">
         <h3>Roz yaad dilao</h3>
@@ -1682,27 +1692,40 @@ a.btn{text-decoration:none;text-align:center}
     };
   }
 
-  async function setReminder(h){
-    const me = meM();
-    const note = t => { S.remindNote = t; const n = $("#rnote"); if (n) n.textContent = t; };
-    if (h === null) {
-      await S.sb.from("members").update({ remind_at:null }).eq("id", me.id);
-      me.remind_at = null; note("Reminder band. Jab chaho phir chalu kar lena."); render(); return;
-    }
-    if (!cfg.vapidPublicKey) return note("Reminders abhi set up nahi hue. Shiv se kaho README ka reminder wala step kar de.");
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return note(isIOS() && !isStandalone() ? "iPhone pe pehle Share > Add to Home Screen karo, phir wahan se app kholke yeh chuno." : "Is browser mein reminder nahi chal sakte. Chrome mein kholke try karo.");
+  // Turn on push for this phone and save its address. Returns null, or why it didn't work.
+  async function pushOn(){
+    if (!cfg.vapidPublicKey) return "Notification abhi set up nahi hue. Shiv se kaho README ka reminder wala step kar de.";
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return isIOS() && !isStandalone() ? "iPhone pe pehle Share > Add to Home Screen karo, phir wahan se app kholke yeh chuno." : "Is browser mein notification nahi chal sakte. Chrome mein kholke try karo.";
     try {
       const perm = await Notification.requestPermission();
-      if (perm !== "granted") return note("Notification ki permission nahi mili. Phone ki settings mein is site ko allow karo.");
+      if (perm !== "granted") return "Notification ki permission nahi mili. Phone ki settings mein is site ko allow karo.";
       const reg = await Promise.race([navigator.serviceWorker.ready, new Promise((_, j) => setTimeout(() => j(new Error("sw")), 8000))]);
       const key = Uint8Array.from(atob(cfg.vapidPublicKey.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((cfg.vapidPublicKey.length + 3) % 4)), c => c.charCodeAt(0));
       const sub = (await reg.pushManager.getSubscription()) || (await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:key }));
       const j = sub.toJSON();
-      const [a, b] = await Promise.all([S.sb.from("push_subs").upsert({ endpoint:j.endpoint, family_id:S.fam.id, member:me.id, p256dh:j.keys.p256dh, auth:j.keys.auth }, { onConflict:"endpoint" }),
-        S.sb.from("members").update({ remind_at:h }).eq("id", me.id)]);
-      if (a.error || b.error) return note("Save nahi hua. Dobara try karo.");
-      me.remind_at = h; note(`Ho gaya! Roz ${REMIND.find(r => r[1] === h)[0].toLowerCase()} baje yaad dilayenge, agar tab tak kuch nahi daala.`); render();
-    } catch { note("Reminder chalu nahi ho paaya. Thodi der baad dobara try karo."); }
+      const { error } = await S.sb.from("push_subs").upsert({ endpoint:j.endpoint, family_id:S.fam.id, member:S.me, p256dh:j.keys.p256dh, auth:j.keys.auth }, { onConflict:"endpoint" });
+      return error ? "Save nahi hua. Dobara try karo." : null;
+    } catch { return "Notification chalu nahi ho paaya. Thodi der baad dobara try karo."; }
+  }
+  // A line under a Parivaar setting that survives the next redraw.
+  const sayIn = (key, id) => t => { S[key] = t; const n = $("#" + id); if (n) n.textContent = t; };
+  async function setReminder(h){
+    const me = meM(), note = sayIn("remindNote", "rnote");
+    if (h !== null) { const why = await pushOn(); if (why) return note(why); }
+    const { error } = await S.sb.from("members").update({ remind_at:h }).eq("id", me.id);
+    if (error) return note("Save nahi hua. Dobara try karo.");
+    me.remind_at = h;
+    note(h === null ? "Reminder band. Jab chaho phir chalu kar lena." : `Ho gaya! Roz ${REMIND.find(r => r[1] === h)[0].toLowerCase()} baje yaad dilayenge, agar tab tak kuch nahi daala.`);
+    render();
+  }
+  async function setNotify(v){
+    const me = meM(), note = sayIn("notifyNote", "nnote");
+    if (v !== "off") { const why = await pushOn(); if (why) return note(why); }
+    const { error } = await S.sb.from("members").update({ notify:v }).eq("id", me.id);
+    if (error) return note("Save nahi hua. Dobara try karo.");
+    me.notify = v;
+    note(v === "off" ? "Notification band. Roz wala reminder alag hai, woh neeche se band karo." : v === "mine" ? "Ho gaya! Sirf aapki photo pe kuch ho, tab batayenge." : "Ho gaya! Parivaar mein kuch naya ho, toh batayenge.");
+    render();
   }
 
   // Flip my stamp at once, then save. Duplicates are ignored by the database (upsert), errors undo the flip.
@@ -1751,6 +1774,7 @@ a.btn{text-decoration:none;text-align:center}
     else if (a === "install") doInstall();
     else if (a === "installx") { ls.set("fkd-install-x", "1"); render(); }
     else if (a === "remind") setReminder(t.dataset.h === "" ? null : Number(t.dataset.h));
+    else if (a === "notify") setNotify(t.dataset.v);
     else if (a === "leaveself") confirmSheet("Parivaar chhodna hai?", "Aapka naam, photos, comments aur doodles hat jayenge, aur aapki dil ki baatein Gupt ban jayengi. Yeh wapas nahi hoga.", "Haan, chhodo", async () => {
       rpc("remove_member", { target:S.me }).then(forgetDevice, e => failSheet(errText(e)));
     });

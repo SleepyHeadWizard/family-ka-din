@@ -1,4 +1,4 @@
-// Family Ka Din service worker: works offline-safe and shows reminder notifications.
+// Family Ka Din service worker: works offline-safe and shows reminders and family notifications.
 const SHELL = "fkd-shell-v1";
 const FILES = ["./", "./index.html", "./config.js", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon.svg"];
 
@@ -34,7 +34,8 @@ self.addEventListener("push", (e) => {
     body: d.body || "Aaj ka pal daala?",
     icon: "icon-192.png",
     badge: "icon-192.png",
-    tag: "family-nudge",
+    tag: d.tag || "family-nudge",   // one per kind: a new photo doesn't hide a comment
+    renotify: true,
     data: { url: d.url || "./" }
   }));
 });
