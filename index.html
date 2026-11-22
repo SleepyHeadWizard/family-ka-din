@@ -1177,7 +1177,8 @@ a.btn{text-decoration:none;text-align:center}
       const clean = t => String(t).replace(/[\/:*?"<>|\x00-\x1f]/g, "").trim() || "Koi";
       const fetchOne = async p => {
         const t = new Date(p.ts), hm = String(t.getHours()).padStart(2, "0") + String(t.getMinutes()).padStart(2, "0");
-        p.file = `photos/${p.day}/${hm} ${clean(mName(p.member))} ${tagName(p)} ${p.id.slice(0, 4)}.jpg`;
+        const day = /^\d{4}-\d\d-\d\d$/.test(p.day) ? p.day : dayKey(t);   // day is phone-written text: no "../" in the ZIP
+        p.file = `photos/${day}/${hm} ${clean(mName(p.member))} ${tagName(p)} ${p.id.slice(0, 4)}.jpg`;
         const { data, error } = await S.sb.storage.from("photos").download(p.path);
         if (error) { missing.push(p.path); p.file = null; }
         else files.push({ name:p.file, data, date:t });
